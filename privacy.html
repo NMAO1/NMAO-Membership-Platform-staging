@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — NMAO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Serif+Pro:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #B8862C;
+      --gold-light: #D4A93D;
+      --gold-bright: #F5D462;
+      --ink: #1a1a1a;
+      --ink-soft: #3d3d3d;
+      --paper: #faf7f0;
+      --paper-soft: #f1ebdb;
+      --rule: #d9cfb6;
+      --font-display: 'Libre Baskerville', Georgia, serif;
+      --font-body: 'Source Serif Pro', Charter, Georgia, serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      background: #0a0a0a;
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid var(--gold);
+    }
+    .header-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header img { height: 36px; width: 36px; }
+    .header-text {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-light) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+    .doc-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+    .doc-meta {
+      font-style: italic;
+      color: var(--ink-soft);
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    h2::before {
+      content: counter(section) ". ";
+      color: var(--gold);
+      counter-increment: section;
+    }
+    body { counter-reset: section; }
+    h3 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--ink-soft);
+    }
+    p { margin-bottom: 1.1rem; color: var(--ink-soft); }
+    ul, ol {
+      margin: 0 0 1.1rem 1.5rem;
+      color: var(--ink-soft);
+    }
+    li { margin-bottom: 0.5rem; }
+    a {
+      color: var(--gold);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    a:hover { color: var(--ink); }
+    strong { color: var(--ink); font-weight: 600; }
+    .callout {
+      background: var(--paper-soft);
+      border-left: 3px solid var(--gold);
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+    th {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--paper-soft);
+    }
+    td { color: var(--ink-soft); }
+    .footer {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--rule);
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      .doc-title { font-size: 1.85rem; }
+      .container { padding: 2.5rem 1.5rem 4rem; }
+      body { font-size: 16px; }
+      table { font-size: 0.85rem; }
+      th, td { padding: 0.5rem 0.65rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <img src="nmao_logo.png" alt="NMAO" />
+      <span class="header-text">NMAO</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="doc-title">Privacy Policy</h1>
+    <p class="doc-meta">Last updated: May 27, 2026</p>
+
+    <p>This Privacy Policy describes how NMAO Inc. ("NMAO," "we," "us," or "our") collects, uses, and shares information when you use the NMAO platform and related services (the "Service"). We respect your privacy and are committed to handling your information responsibly.</p>
+
+    <p>NMAO operates a multi-tenant software platform used by martial arts schools ("Schools") to manage their operations. When you use the Service as an End User—a student, parent, guardian, or other person enrolled at or interacting with a School—both NMAO and the School may act as data controllers of your information for different purposes, as described below.</p>
+
+    <h2>Information We Collect</h2>
+    <p>We collect the following categories of information:</p>
+
+    <h3>Information you provide</h3>
+    <ul>
+      <li><strong>Identity and contact:</strong> name, date of birth, email address, mailing address, phone number;</li>
+      <li><strong>Account credentials:</strong> email or other identifier used for authentication; we use magic-link sign-in and do not store passwords for End User accounts;</li>
+      <li><strong>School membership information:</strong> School affiliation, membership type, belt rank, instructor, attendance records, session packs, and similar enrollment data;</li>
+      <li><strong>Family relationships:</strong> for minors, the name and contact information of the parent or guardian who authorizes the minor's participation;</li>
+      <li><strong>Communications:</strong> messages you send to your School or to NMAO support, including SMS replies and email correspondence;</li>
+      <li><strong>User content:</strong> profile photos, notes, and other content you submit to the Service;</li>
+      <li><strong>Emergency contact and medical/notes information:</strong> if your School collects this for safety purposes through NMAO-powered forms.</li>
+    </ul>
+
+    <h3>Payment information</h3>
+    <p>When you make a payment through the Service, payment card details are collected and processed directly by <strong>Stripe</strong>. NMAO does not store full card numbers or CVV codes. We receive limited payment metadata (such as the last four digits of the card, brand, expiration, and transaction status) from Stripe to display in your account history and for billing administration.</p>
+
+    <h3>Information collected automatically</h3>
+    <ul>
+      <li><strong>Device and connection:</strong> IP address, browser type, device type, operating system, and similar technical metadata;</li>
+      <li><strong>Usage:</strong> pages visited, features used, timestamps, and similar interaction data;</li>
+      <li><strong>Cookies and local storage:</strong> we use cookies and browser local storage to maintain your authenticated session, remember preferences, and operate the Service. We do not use third-party advertising or behavioral tracking cookies.</li>
+    </ul>
+
+    <h2>How We Use Information</h2>
+    <p>We use the information we collect to:</p>
+    <ul>
+      <li>Operate, maintain, and provide the features of the Service;</li>
+      <li>Process payments and manage memberships, classes, and account activity on behalf of your School;</li>
+      <li>Send transactional communications (SMS reminders, payment receipts, attendance confirmations, magic link sign-in emails);</li>
+      <li>Respond to your requests and provide customer support;</li>
+      <li>Detect, investigate, and prevent fraud, abuse, and security incidents;</li>
+      <li>Comply with legal obligations;</li>
+      <li>Improve and develop the Service.</li>
+    </ul>
+    <p>We do not sell your personal information, and we do not use your information for cross-context behavioral advertising.</p>
+
+    <h2>How We Share Information</h2>
+    <p>We share information in the following limited circumstances:</p>
+
+    <h3>With your School</h3>
+    <p>The School you are affiliated with has access to your account information, attendance records, payment history, and any other data you submit through the Service. The School uses this information to operate its business and serve you. The School is a separate data controller of this information and applies its own policies in addition to ours.</p>
+
+    <h3>With service providers (subprocessors)</h3>
+    <p>We share information with trusted third-party service providers that help us operate the Service. These providers are bound by contract to handle information only as needed to provide their services. Key subprocessors include:</p>
+    <table>
+      <thead>
+        <tr><th>Provider</th><th>Purpose</th><th>More info</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Stripe</strong></td>
+          <td>Payment processing and card data handling</td>
+          <td><a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Twilio</strong></td>
+          <td>SMS message delivery and two-way SMS handling</td>
+          <td><a href="https://www.twilio.com/legal/privacy" target="_blank" rel="noopener">twilio.com/legal/privacy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Resend</strong></td>
+          <td>Transactional email delivery</td>
+          <td><a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">resend.com/legal/privacy-policy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Supabase</strong></td>
+          <td>Database, authentication, and application infrastructure hosting</td>
+          <td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td>
+        </tr>
+        <tr>
+          <td><strong>GitHub Pages</strong></td>
+          <td>Static web hosting for the platform interface</td>
+          <td><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">github.com privacy statement</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>For legal reasons</h3>
+    <p>We may disclose information if required by law, subpoena, court order, or other valid legal process, or when we believe disclosure is necessary to protect our rights, your safety, the safety of others, or to investigate fraud or security incidents.</p>
+
+    <h3>In connection with a business transfer</h3>
+    <p>If NMAO is involved in a merger, acquisition, sale of assets, or bankruptcy, your information may be transferred to a successor entity. We will notify affected users via email or through the Service if a transfer materially affects how your information is handled.</p>
+
+    <h2>SMS Communications</h2>
+    <p>When you provide your mobile phone number and opt in to receive SMS messages — through a School's enrollment form, a member portal opt-in, the lead-generation kiosk, in-person enrollment with documented verbal consent, or by texting an opt-in keyword (such as JOIN, START, YES, or SUBSCRIBE) to your School's NMAO number — you consent to receive operational text messages from your School delivered via the NMAO platform.</p>
+
+    <h3>Types of messages</h3>
+    <p>SMS messages sent through NMAO are operational and customer-care focused, not promotional. They may include:</p>
+    <ul>
+      <li>Class confirmations, reminders, and schedule changes;</li>
+      <li>Attendance check-in confirmations and absentee follow-ups;</li>
+      <li>Payment receipts, billing reminders, and payment failure notifications;</li>
+      <li>Account and membership status updates;</li>
+      <li>Belt test, event, and tournament notifications;</li>
+      <li>Two-way confirmation prompts (e.g., to confirm or cancel a scheduled session);</li>
+      <li>Milestone and customer-care messages (e.g., birthday acknowledgments from your School).</li>
+    </ul>
+    <p>NMAO does not use SMS for marketing, advertising, or promotional content on behalf of third parties.</p>
+
+    <h3>Message frequency and rates</h3>
+    <p>Message frequency varies based on your enrollment activity and your School's communication practices — typically a few messages per month, with more during busy periods such as events or belt-test weeks. Standard message and data rates may apply per your wireless carrier's plan. Carriers are not liable for delayed or undelivered messages.</p>
+
+    <h3>Opt-out and help</h3>
+    <p>You may opt out of SMS at any time by replying <strong>STOP</strong>, STOPALL, UNSUBSCRIBE, CANCEL, END, or QUIT to any message. Opt-out is immediate. For help, reply <strong>HELP</strong>, INFO, or SUPPORT to any message, or contact your School directly. You may re-subscribe at any time by replying START or by contacting your School.</p>
+
+    <h3>How SMS opt-in data is handled</h3>
+    <p>We do not sell, rent, lease, share, or otherwise disclose your mobile phone number, SMS opt-in status, or related consent information to any third party for marketing or promotional purposes. SMS opt-in data is used only to deliver the operational messages you have consented to receive, and is shared only with the service providers necessary to operate the messaging service — principally <strong>Twilio</strong>, our SMS delivery provider, which is bound by contract to handle this information only on our behalf and in accordance with our instructions. SMS opt-in data is not used for cross-platform advertising, behavioral tracking, or any purpose unrelated to delivering the messages you have requested.</p>
+
+    <h2>Data Retention</h2>
+    <p>We retain information for as long as your account is active and as needed to provide the Service. After account closure, we may retain certain information for a reasonable period to comply with legal obligations, resolve disputes, enforce agreements, maintain payment and tax records, or support legitimate business interests. Specific retention periods vary by data category; contact us at <a href="mailto:support@nmao.us">support@nmao.us</a> for details.</p>
+
+    <h2>Your Rights and Choices</h2>
+    <p>Depending on where you live, you may have rights regarding your personal information, including:</p>
+    <ul>
+      <li><strong>Access:</strong> request a copy of personal information we hold about you;</li>
+      <li><strong>Correction:</strong> request that we correct inaccurate or incomplete information;</li>
+      <li><strong>Deletion:</strong> request that we delete personal information, subject to limited exceptions (e.g., legal recordkeeping);</li>
+      <li><strong>Communications opt-out:</strong> opt out of SMS by replying <strong>STOP</strong> to any message; opt out of non-essential emails via the unsubscribe link in those emails;</li>
+      <li><strong>Account closure:</strong> request to deactivate or delete your account.</li>
+    </ul>
+    <p>To exercise these rights, contact your School directly or email us at <a href="mailto:support@nmao.us">support@nmao.us</a>. We may need to verify your identity before fulfilling a request. Some information must be retained for legal or operational reasons even after deletion of an account.</p>
+
+    <h2>Children's Privacy (COPPA)</h2>
+    <p>NMAO is intended for use by adults and by minors enrolled at a participating School with verifiable parental or guardian consent. We do not knowingly collect personal information directly from children under 13 without such consent.</p>
+    <p>When a School enrolls a minor through NMAO, the School is responsible for obtaining and documenting parental or guardian consent for the collection and use of the minor's information, in compliance with the Children's Online Privacy Protection Act (COPPA) and applicable state laws. NMAO acts as a service provider to the School in handling the minor's information and uses it only to provide the Service.</p>
+    <p>A parent or guardian may:</p>
+    <ul>
+      <li>Review the personal information NMAO holds about their child;</li>
+      <li>Request that NMAO update or delete the child's personal information;</li>
+      <li>Refuse to permit further collection or use of the child's information (which may result in the child no longer being able to use the Service).</li>
+    </ul>
+    <p>To exercise these rights, contact the School your child is enrolled at, or email <a href="mailto:support@nmao.us">support@nmao.us</a>. We will work with the School to verify the parental relationship and respond to the request.</p>
+
+    <h2>Security</h2>
+    <p>We use reasonable administrative, technical, and physical safeguards to protect your information, including encryption of data in transit (HTTPS/TLS), encryption at rest where supported by our infrastructure providers, access controls, and authentication via short-lived magic links rather than long-lived passwords. However, no method of transmission or storage is completely secure. We cannot guarantee absolute security, and you use the Service at your own risk.</p>
+
+    <h2>California Residents</h2>
+    <p>If you are a California resident, the California Consumer Privacy Act (CCPA) provides you with additional rights regarding your personal information, including the right to know what categories of personal information we collect, the right to request deletion, the right to correct inaccurate information, and the right to non-discrimination for exercising these rights. We do not sell personal information and do not engage in cross-context behavioral advertising. To exercise your CCPA rights, contact us at <a href="mailto:support@nmao.us">support@nmao.us</a>.</p>
+
+    <h2>International Users</h2>
+    <p>The Service is operated from the United States and is intended for users in the United States. If you access the Service from outside the U.S., your information will be transferred to, stored, and processed in the United States. By using the Service, you consent to such transfer and processing.</p>
+
+    <h2>Cookies and Tracking</h2>
+    <p>We use cookies and browser local storage for essential purposes only: maintaining your authenticated session, remembering interface preferences, and operating the Service. We do not use cookies for advertising or cross-site behavioral tracking. Most browsers allow you to control cookies through their settings, but disabling cookies may impair the functionality of the Service.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. When we make material changes, we will notify you via email or through the Service and update the "Last updated" date at the top of this page. Your continued use of the Service after such changes constitutes acceptance of the updated Policy.</p>
+
+    <h2>Contact Us</h2>
+    <p>Questions, requests, or concerns about your privacy or this Policy? Contact us at:</p>
+    <div class="callout">
+      NMAO Inc.<br/>
+      376 South Bayview Avenue<br/>
+      Freeport, NY 11520<br/>
+      Email: <a href="mailto:support@nmao.us">support@nmao.us</a><br/>
+      Web: <a href="https://nmao.us">nmao.us</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    © 2026 NMAO Inc. All rights reserved. &nbsp;·&nbsp; <a href="terms.html">Terms of Service</a>
+  </footer>
+</body>
+</html>

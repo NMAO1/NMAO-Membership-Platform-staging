@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMAO Platform — Software Built for Martial Arts Schools</title>
+<meta name="description" content="All-in-one software built for martial arts schools — memberships, billing, scheduling, belts, kiosk check-in, and two-way SMS. $99/mo, unlimited students, 90-day free trial, no credit card.">
+<meta property="og:title" content="NMAO Platform — Software Built for Martial Arts Schools">
+<meta property="og:description" content="Run your entire school in one place. $99/mo, unlimited students, 1,000 texts included, payment processing passed through at cost. Free 90-day trial — no credit card.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://app.nmao.us/">
+<meta property="og:image" content="https://app.nmao.us/nmao_logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="nmao_logo.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ── Self-contained styles for new sections (independent of styles.css) ── */
+  .trust-line{
+    max-width:760px;margin:1.75rem auto 0;text-align:center;
+    font-size:0.82rem;letter-spacing:0.04em;color:#9A8F80;font-style:italic;
+  }
+  .trust-line b{color:#C9A84C;font-style:normal;font-weight:700;}
+
+  /* Single-plan card */
+  .price-solo{
+    max-width:560px;margin:0 auto;padding:2.75rem 2.5rem;
+    background:linear-gradient(180deg,rgba(201,168,76,0.10),rgba(201,168,76,0.02));
+    border:1px solid rgba(201,168,76,0.45);border-top:3px solid #C9A84C;
+    text-align:center;
+  }
+  .price-solo .ps-eyebrow{
+    font-family:'Lato',sans-serif;font-size:0.68rem;letter-spacing:0.2em;
+    text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:1rem;
+  }
+  .price-solo .ps-amount{
+    font-family:'Libre Baskerville',serif;color:#F5F0E8;line-height:1;
+    margin-bottom:0.4rem;
+  }
+  .price-solo .ps-amount .ps-d{font-size:1.6rem;vertical-align:top;color:#9A8F80;}
+  .price-solo .ps-amount .ps-n{font-size:4.2rem;font-weight:700;}
+  .price-solo .ps-amount .ps-p{font-size:1.1rem;color:#9A8F80;}
+  .price-solo .ps-trial{font-size:0.9rem;color:#F5F0E8;font-weight:700;margin-bottom:1.5rem;}
+  .price-solo .ps-plus{font-size:1rem;color:#C9A84C;font-weight:700;margin:0.5rem 0 1.3rem;}
+  .price-solo .ps-plus span{color:#9A8F80;font-weight:400;font-size:0.85rem;}
+  .price-solo .ps-accred{
+    margin:0 auto 1.75rem;max-width:340px;padding:0.85rem 1rem;
+    background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.05));
+    border:1px solid rgba(201,168,76,0.45);border-left:3px solid #C9A84C;
+  }
+  .price-solo .ps-accred .lbl{
+    font-family:'Lato',sans-serif;font-size:0.58rem;letter-spacing:0.18em;
+    text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:0.2rem;
+  }
+  .price-solo .ps-accred .amt{
+    font-family:'Libre Baskerville',serif;font-size:1.5rem;color:#F5F0E8;font-weight:700;line-height:1;
+  }
+  .price-solo .ps-accred .amt span{font-size:0.8rem;color:#9A8F80;font-weight:400;}
+  .price-solo .ps-accred .amt .strike{text-decoration:line-through;color:#9A8F80;font-weight:400;font-size:1.05rem;margin-right:0.4rem;}
+  .price-solo .ps-accred .accred-plus{font-size:0.7rem;color:#C9A84C;font-weight:700;margin-top:0.4rem;letter-spacing:0.03em;}
+  .price-solo .ps-accred .sub{font-size:0.6rem;color:#9A8F80;font-style:italic;margin-top:0.3rem;}
+  .ps-features{
+    list-style:none;padding:0;margin:0 0 1.85rem;text-align:left;
+    max-width:380px;margin-left:auto;margin-right:auto;
+    color:#C2B7A8;font-size:0.9rem;line-height:1.5;
+  }
+  .ps-features li{padding:0.45rem 0 0.45rem 1.6rem;position:relative;border-bottom:1px solid rgba(201,168,76,0.10);}
+  .ps-features li:last-child{border-bottom:none;}
+  .ps-features li::before{content:"\25C8";position:absolute;left:0;color:#C9A84C;font-size:0.85rem;}
+  .ps-cta{
+    display:inline-block;background:#C9A84C;color:#0A0A0A;border:none;cursor:pointer;
+    font-family:'Libre Baskerville',serif;font-size:0.82rem;letter-spacing:0.14em;
+    text-transform:uppercase;font-weight:700;padding:1rem 2.5rem;transition:opacity 0.2s;
+  }
+  .ps-cta:hover{opacity:0.88;}
+
+  /* FAQ accordion */
+  #faq{padding:6rem 1.5rem;}
+  .faq-wrap{max-width:780px;margin:3rem auto 0;}
+  .faq-item{border:1px solid rgba(201,168,76,0.18);border-bottom:none;background:linear-gradient(180deg,rgba(201,168,76,0.03),rgba(201,168,76,0.01));}
+  .faq-item:last-child{border-bottom:1px solid rgba(201,168,76,0.18);}
+  .faq-q{
+    width:100%;text-align:left;background:none;border:none;cursor:pointer;
+    padding:1.35rem 1.6rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    font-family:'Libre Baskerville',serif;font-size:1.02rem;color:#F5F0E8;font-weight:700;line-height:1.35;
+  }
+  .faq-q:hover{color:#C9A84C;}
+  .faq-mark{flex-shrink:0;color:#C9A84C;font-size:1.2rem;transition:transform 0.25s ease;font-family:'Lato',sans-serif;}
+  .faq-item.open .faq-mark{transform:rotate(45deg);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+  .faq-a-inner{padding:0 1.6rem 1.4rem;color:#C2B7A8;font-size:0.92rem;line-height:1.65;}
+  .faq-item.open .faq-a{max-height:340px;}
+
+  /* Signup reassurance microcopy */
+  .signup-reassure{text-align:center;font-size:0.72rem;color:#9A8F80;margin-top:0.85rem;letter-spacing:0.03em;}
+  .signup-reassure b{color:#C9A84C;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">NMAO <span>Platform</span></div>
+  <ul class="nav-links">
+    <li><a href="#ecosystem">Ecosystem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><button class="btn-nav" onclick="openModal('login')">Sign In</button></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-ring"></div>
+  <p class="hero-tag" style="font-size:1.5rem;letter-spacing:0.05em;">Built by Martial Artists, For Martial Artists</p>
+  <h1 class="hero-title">Save Money.<br><em>Save Time.</em></h1>
+  <p class="hero-sub">The membership management software built exclusively for martial arts schools. Half the cost of incumbents, twice the focus on what actually matters.</p>
+  <div class="hero-ctas">
+    <button class="btn-primary" onclick="openModal('signup')">Start Free Trial</button>
+    <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore Features</button>
+  </div>
+  <p class="trust-line">Built and run every day at real schools — including <b>The Art of Self Defense</b>, Oceanside NY.</p>
+<div class="hero-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:1.5rem;max-width:900px;margin:3rem auto 0;">
+
+    <div style="text-align:left;padding:2rem;border:1px solid rgba(201,168,76,0.3);background:linear-gradient(180deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));">
+      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:0.7rem;line-height:1;">&#9672; Save Money</div>
+      <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Half the cost. Transparent fees. Built-in everything.</div>
+      <ul style="list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.85rem;line-height:1.55;">
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Half the monthly subscription of Mindbody, Zen Planner, and Pike13</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Stripe payment processing passed through at cost &mdash; never marked up</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>1% platform fee, capped at $200/mo &mdash; competitors pad every swipe</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>NMAO Accredited schools pay $0/month &mdash; no subscription at all</li>
+      </ul>
+    </div>
+
+    <div style="text-align:left;padding:2rem;border:1px solid rgba(201,168,76,0.3);background:linear-gradient(180deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));">
+      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:0.7rem;line-height:1;">&#9671; Save Time</div>
+      <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Run the school. Skip the busywork.</div>
+      <ul style="list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.85rem;line-height:1.55;">
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Self-serve kiosk check-in &mdash; your front desk gets its time back</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Automated session pack deduction on every class attended</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Two-way SMS inbox &mdash; text the whole school or one parent</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Triggered automations for renewals, missed classes, expirations</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-label">What We Offer</p>
+  <h2 class="section-title">Everything Your School Needs</h2>
+  <p class="section-body">Purpose-built for martial arts schools. No generic software, no compromises.</p>
+
+  <style>
+    .feat-v2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;max-width:1200px;margin:4rem auto 0;padding:0 1.5rem;}
+    .feat-v2-card{background:linear-gradient(180deg,rgba(201,168,76,0.04),rgba(201,168,76,0.01));border:1px solid rgba(201,168,76,0.18);padding:2rem 1.85rem;display:flex;flex-direction:column;transition:transform 0.25s ease,border-color 0.25s ease,box-shadow 0.25s ease;}
+    .feat-v2-card:hover{border-color:rgba(201,168,76,0.45);transform:translateY(-3px);box-shadow:0 12px 32px rgba(201,168,76,0.08);}
+    .feat-v2-icon{font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:1.1rem;line-height:1;}
+    .feat-v2-title{font-family:'Libre Baskerville',serif;font-size:1.3rem;color:#F5F0E8;margin:0 0 0.75rem;font-weight:700;line-height:1.25;}
+    .feat-v2-tagline{color:#9A8F80;font-size:0.9rem;line-height:1.6;margin:0 0 1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(201,168,76,0.12);}
+    .feat-v2-bullets{list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.82rem;line-height:1.55;}
+    .feat-v2-bullets li{padding:0.3rem 0 0.3rem 1.05rem;position:relative;}
+    .feat-v2-bullets li::before{content:"\25AA";position:absolute;left:0;color:#C9A84C;font-size:0.85rem;line-height:1.6;}
+  </style>
+
+  <div class="feat-v2-grid">
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9672;</div>
+      <h3 class="feat-v2-title">All-In-One Command Center</h3>
+      <p class="feat-v2-tagline">Members, classes, revenue, and tomorrow's schedule &mdash; your morning briefing on one screen.</p>
+      <ul class="feat-v2-bullets">
+        <li>Live KPIs: members, leads, sessions, revenue</li>
+        <li>Week-at-a-glance class calendar with enrollments</li>
+        <li>Today, yesterday, and month-to-date revenue</li>
+        <li>Membership alerts: paused, expiring, attendance gaps</li>
+        <li>Belt Progressions and Belt Tests built in</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9670;</div>
+      <h3 class="feat-v2-title">Self-Serve Check-In Kiosk</h3>
+      <p class="feat-v2-tagline">Students check themselves in. Your front desk gets its time back.</p>
+      <ul class="feat-v2-bullets">
+        <li>Type-to-find with autocomplete from your roster</li>
+        <li>Family check-in for siblings &mdash; one tap each</li>
+        <li>Auto-deducts from session packs on check-in</li>
+        <li>Belt-color celebration screens for milestones</li>
+        <li>Runs on iPad, tablet, or any browser &mdash; no install</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9671;</div>
+      <h3 class="feat-v2-title">Member Portal (Per School)</h3>
+      <p class="feat-v2-tagline">Every school gets a branded portal &mdash; students see what's theirs, families see their kids.</p>
+      <ul class="feat-v2-bullets">
+        <li>Schedule view with one-tap RSVP to classes</li>
+        <li>Belt progress with attached YouTube curriculum</li>
+        <li>Session pack balances and renewal flow</li>
+        <li>Family view for parents managing multiple kids</li>
+        <li>School-branded &mdash; your colors, your logo</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9672;</div>
+      <h3 class="feat-v2-title">Staff Portal &amp; Instructor Tools</h3>
+      <p class="feat-v2-tagline">Built for the mat &mdash; instructors take attendance, see today's class, and reach students from one screen.</p>
+      <ul class="feat-v2-bullets">
+        <li>Take attendance with auto session-pack deduction</li>
+        <li>Today's class rosters with belt-rank flags</li>
+        <li>Mark walk-ins and no-shows in one tap</li>
+        <li>Per-instructor performance and payroll estimate</li>
+        <li>Mobile-first &mdash; works on phones in the studio</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9671;</div>
+      <h3 class="feat-v2-title">Lead Pipeline &amp; Public Signup</h3>
+      <p class="feat-v2-tagline">A branded prospect-to-student funnel without the marketing-tech stack.</p>
+      <ul class="feat-v2-bullets">
+        <li>Public signup page on your school's URL</li>
+        <li>YouTube highlight reel, testimonial, and stats above the fold</li>
+        <li>Program-interest dropdown &mdash; leads arrive pre-segmented</li>
+        <li>Pipeline stages: New &rarr; Contacted &rarr; Trial &rarr; Converted</li>
+        <li>Follow-up automations included &mdash; no Mailchimp wiring</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9672;</div>
+      <h3 class="feat-v2-title">Communications That Send</h3>
+      <p class="feat-v2-tagline">SMS, email, automations, and portal invites &mdash; one inbox, one outbox.</p>
+      <ul class="feat-v2-bullets">
+        <li>Two-way SMS thread per student, families merged</li>
+        <li>Broadcast templates: birthdays, promotions, renewals, belt tests</li>
+        <li>Triggered automations for expiring memberships and missed classes</li>
+        <li>Bulk magic-link portal invites for self-service</li>
+        <li>Audience filtering by program, status, and tag</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9670;</div>
+      <h3 class="feat-v2-title">Analytics &amp; Reports</h3>
+      <p class="feat-v2-tagline">The numbers that actually move a martial arts school &mdash; not generic SaaS dashboards.</p>
+      <ul class="feat-v2-bullets">
+        <li>Lead funnel with conversion rates at every stage</li>
+        <li>Instructor comparison: classes, sessions, estimated payroll</li>
+        <li>13 canned reports including Retention Risk and Class Utilization</li>
+        <li>6-month revenue trend with monthly granularity</li>
+        <li>One-click CSV export for taxes and accountants</li>
+      </ul>
+    </div>
+    <div class="feat-v2-card">
+      <div class="feat-v2-icon">&#9671;</div>
+      <h3 class="feat-v2-title">Belt Progressions &amp; Curriculum</h3>
+      <p class="feat-v2-tagline">Track ranks, attach video curriculum per belt, and run testing events from one place.</p>
+      <ul class="feat-v2-bullets">
+        <li>Build any belt system: kids, adults, kickboxing, BJJ stripes</li>
+        <li>YouTube video curriculum attached per belt level</li>
+        <li>"Eligible to Promote" auto-detection by attendance and time</li>
+        <li>Belt test events with rosters and pass/fail tracking</li>
+        <li>Promotion history per student &mdash; never lose a record</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <p class="section-label">Investment</p>
+  <h2 class="section-title">One Plan. Honest Pricing.</h2>
+  <p class="section-body">Everything included. No tiers to decode, no add-ons to stack.</p>
+
+  <!-- ACCREDITATION DISCOUNT BANNER -->
+  <div style="max-width:820px;margin:0 auto 2.5rem;background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.45);border-left:4px solid #C9A84C;padding:1.5rem 2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+    <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#C9A84C;">&#9672;</div>
+    <div style="flex:1;min-width:280px;">
+      <div style="font-family:'Libre Baskerville',serif;font-size:1.1rem;color:#C9A84C;font-weight:700;margin-bottom:0.35rem;">NMAO Accredited Schools Run Free</div>
+      <div style="font-size:0.88rem;color:#9A8F80;line-height:1.55;">Schools holding active NMAO Accreditation pay <strong style="color:#C9A84C;">$0/mo</strong> &mdash; no monthly fee, just a 1% platform fee capped at $200. Applied automatically at checkout.</div>
+    </div>
+    <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Libre Baskerville',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.85rem 1.5rem;text-decoration:none;font-weight:700;white-space:nowrap;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Accredited &rarr;</a>
+  </div>
+
+  <!-- SINGLE PLAN -->
+  <div class="price-solo">
+    <div class="ps-eyebrow">&#9672; One Plan, Everything Included</div>
+    <div class="ps-amount"><span class="ps-d">$</span><span class="ps-n">99</span><span class="ps-p">/mo</span></div>
+    <div class="ps-plus">+ 1% platform fee <span>&mdash; capped at $200/mo</span></div>
+    <div class="ps-trial">Free for 90 days &mdash; no credit card required.</div>
+    <div class="ps-accred">
+      <div class="lbl">&#9672; NMAO Accredited Rate</div>
+      <div class="amt"><span class="strike">$99</span>$0<span>/mo</span></div>
+      <div class="accred-plus">+ 1% platform fee still applies (capped at $200/mo)</div>
+      <div class="sub">Monthly fee fully waived with active NMAO Accreditation</div>
+    </div>
+    <ul class="ps-features">
+      <li>Unlimited students &mdash; no per-student charges</li>
+      <li>Every feature: kiosk, portal, POS, belts, automations</li>
+      <li>1,000 text messages a month included</li>
+      <li>1% platform fee, capped at $200/mo</li>
+      <li>Stripe card processing passed through at cost &mdash; never marked up</li>
+      <li>No per-instructor fees, no add-on upcharges</li>
+    </ul>
+    <button class="ps-cta" onclick="openModal('signup')">Start Free Trial</button>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <p class="section-label">Questions</p>
+  <h2 class="section-title">Answers Before You Ask</h2>
+  <p class="section-body">The things every school owner wants to know before switching.</p>
+
+  <div class="faq-wrap">
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Do I really get 90 days free? Do I need a credit card?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Yes &mdash; 90 days, completely free, no card required. Sign up and run real classes, billing, and check-ins from day one. We'll remind you before the trial ends; you only add a card when you decide to keep going.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">What does it cost after the trial?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">$99/month, flat &mdash; one plan, everything included, with unlimited students and 1,000 text messages a month. On top of that, a 1% platform fee (capped at $200/month) applies to the payments you process, and Stripe's processing is passed through at cost with no markup. No per-student or per-instructor charges, and no add-on fees for the kiosk, analytics, QR code generator, staff or member portal. <strong>Schools with active NMAO Accreditation pay $0/month</strong> &mdash; the monthly fee is fully waived, leaving only the 1% platform fee (capped at $200).</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How do the card processing and platform fees work?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">You connect your own Stripe account and pay Stripe's standard rate (about 2.9% + 30&cent;) at cost &mdash; we never mark it up. On top of that, NMAO charges a 1% platform fee, capped at $200/month so it never balloons as you grow. That's the whole story &mdash; no hidden processing margin, which is how most competitors quietly pad their bill.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">When do I get paid, and who holds my money?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">You connect your own Stripe account, so your students' payments go straight to your bank on Stripe's normal schedule. NMAO never holds, touches, or delays your revenue &mdash; your money is always yours, in your account, not ours.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I switch from Mindbody, Zen Planner, or another system?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Yes. Import your student roster, plans, and family accounts by CSV, and we'll personally help you get set up so you're not starting from scratch.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is this really built for martial arts?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Built by an active school owner and run every day at real schools. Belt systems, rank promotions, belt tests, family accounts, session packs, and kiosk check-in are core &mdash; not generic gym software with a karate sticker on it.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Will it match my school's brand?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Yes. Your dashboard, member portal, and public booking page carry your school's name, colors, and logo &mdash; so to your students and families, it looks like your school, not ours.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is texting included?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Every plan includes 1,000 text messages a month. Beyond that it's 3&cent; per message, billed at cost &mdash; never marked up.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is it secure? What about credit card info?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">All payments run through Stripe, a PCI-compliant processor used by millions of businesses. NMAO never sees or stores card numbers &mdash; your members' payment details stay locked in Stripe, never in our database.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I cancel anytime?<span class="faq-mark">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Yes. No long-term contracts and no cancellation fees &mdash; cancel whenever you like, and your data stays exportable on the way out.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <p class="section-label">Get Started</p>
+  <h2 class="section-title">More Time on the Mat.<br>Less Time at the Desk.</h2>
+  <p class="section-body">Lower fees. Built for martial arts. Free 90-day trial &mdash; no credit card required.</p>
+  <span class="gold-rule"></span>
+  <button class="btn-primary" onclick="openModal('signup')">Start Free Trial</button>
+</section>
+
+<!-- ECOSYSTEM -->
+<section id="ecosystem">
+  <p class="section-label">The NMAO Ecosystem</p>
+  <h2 class="section-title">Three Products. One Network.</h2>
+  <p class="section-body">Each product stands alone &mdash; together they create an unstoppable martial arts community.</p>
+  <div class="eco-grid">
+    <div class="eco-card">
+      <div class="eco-icon">&#9672;</div>
+      <h3 class="eco-title">NMAO Accreditation</h3>
+      <p class="eco-text">Earn your school's official NMAO certification and gain credibility across the network.</p>
+      <span class="eco-badge">Available Now</span>
+    </div>
+    <div class="eco-card current">
+      <div class="eco-icon">&#9670;</div>
+      <h3 class="eco-title">NMAO Platform</h3>
+      <p class="eco-text">Manage students, classes, payments, and communications &mdash; all in one place.</p>
+      <span class="eco-badge">You Are Here</span>
+    </div>
+    <div class="eco-card">
+      <div class="eco-icon">&#9671;</div>
+      <h3 class="eco-title">NMAO Tournament</h3>
+      <p class="eco-text">Connect your students to monthly tournaments and competitions across the network.</p>
+      <span class="eco-badge">Coming Soon</span>
+    </div>
+  </div>
+</section>
+
+<!-- ACCREDITATION BANNER -->
+<div style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.03));border-top:1px solid rgba(201,168,76,0.25);border-bottom:1px solid rgba(201,168,76,0.25);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;text-align:center;">
+  <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
+    <div style="width:40px;height:40px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#C9A84C;">&#9672;</div>
+    <div style="text-align:left;">
+      <div style="font-family:'Libre Baskerville',serif;font-size:0.95rem;color:#F5F0E8;font-weight:700;">Is Your School NMAO Accredited?</div>
+      <div style="font-size:0.78rem;color:#9A8F80;margin-top:0.1rem;">Accredited schools pay <strong style="color:#C9A84C;">$0/month</strong> &mdash; the monthly fee is fully waived &mdash; and gain nationwide recognition.</div>
+    </div>
+  </div>
+  <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Libre Baskerville',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.75rem 1.5rem;text-decoration:none;font-weight:700;transition:opacity 0.2s;white-space:nowrap;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Apply for Accreditation &rarr;</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">NMAO</div>
+  <span class="footer-copy">2026 NMAO Platform. All rights reserved.</span>
+  <ul class="footer-links">
+    <li><a href="privacy.html">Privacy</a></li>
+    <li><a href="terms.html">Terms</a></li>
+    <li><a href="mailto:support@nmao.us">Contact</a></li>
+  </ul>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">x</button>
+    <p class="modal-h" id="mH">Welcome Back</p>
+    <p class="modal-s" id="mS">Access your NMAO dashboard</p>
+    <div class="tabs">
+      <button class="tab on" id="tL" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" id="tS" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div id="fL">
+      <div class="field"><label>Email</label><input type="email" id="lE" placeholder="you@school.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="lP" placeholder="password"></div>
+      <button class="btn-sub" onclick="doLogin()">Sign In</button>
+    </div>
+    <div id="fS" style="display:none">
+      <div class="field"><label>School Name</label><input type="text" id="sN" placeholder="Your Martial Arts School"></div>
+      <div class="field"><label>Your Name</label><input type="text" id="sNm" placeholder="Sensei / Master / Sifu"></div>
+      <div class="field"><label>Email</label><input type="email" id="sE" placeholder="you@school.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="sP" placeholder="Create a password"></div>
+      <button class="btn-sub" id="sSub" onclick="doSignup()">Start Free Trial</button>
+      <p class="signup-reassure"><b>90-day free trial</b> &middot; no credit card &middot; cancel anytime</p>
+      <p class="signup-reassure" style="margin-top:0.35rem;opacity:0.8">Best set up on a desktop or laptop.</p>
+    </div>
+    <p class="msg" id="mMsg"></p>
+  </div>
+</div>
+
+<script>
+var SURL = 'https://ykiozrdwudawpxdzbbyc.supabase.co';
+var SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraW96cmR3dWRhd3B4ZHpiYnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNTAwODQsImV4cCI6MjA5MDYyNjA4NH0.MRv1FnXUpGA0wEWe4cW6lSQFcNb7W0Y_nErSZe1hr8c';
+var sc = supabase.createClient(SURL, SKEY);
+
+// Canonical $99 tier (tier_3) - new schools point here for SMS metering + config.
+var NMAO_TIER_ID = '7019f0b2-370b-4702-9e3b-9974382f0b8e';
+
+function openModal(tab) {
+  document.getElementById('overlay').classList.add('open');
+  switchTab(tab || 'login');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('mMsg').textContent = '';
+}
+
+function switchTab(t) {
+  var login = t === 'login';
+  document.getElementById('fL').style.display = login ? 'block' : 'none';
+  document.getElementById('fS').style.display = login ? 'none' : 'block';
+  document.getElementById('tL').className = 'tab' + (login ? ' on' : '');
+  document.getElementById('tS').className = 'tab' + (!login ? ' on' : '');
+  document.getElementById('mH').textContent = login ? 'Welcome Back' : 'Start Your Free Trial';
+  document.getElementById('mS').textContent = login ? 'Access your NMAO dashboard' : 'Create your account - 90 days free, no card';
+  document.getElementById('mMsg').textContent = '';
+}
+
+function setMsg(t, c) {
+  var el = document.getElementById('mMsg');
+  el.textContent = t;
+  el.className = 'msg ' + c;
+}
+
+function toggleFaq(el) {
+  el.parentNode.classList.toggle('open');
+}
+
+async function doLogin() {
+  var e = document.getElementById('lE').value.trim();
+  var p = document.getElementById('lP').value;
+  if (!e || !p) { setMsg('Please fill in all fields.', 'er'); return; }
+  setMsg('Signing in...', '');
+  var r = await sc.auth.signInWithPassword({ email: e, password: p });
+  if (r.error) { setMsg(r.error.message, 'er'); }
+  else { window.location.href = 'dashboard.html'; }
+}
+
+async function doSignup() {
+  var school = document.getElementById('sN').value.trim();
+  var name   = document.getElementById('sNm').value.trim();
+  var email  = document.getElementById('sE').value.trim();
+  var pass   = document.getElementById('sP').value;
+  if (!school || !name || !email || !pass) { setMsg('Please fill in all fields.', 'er'); return; }
+  var btn = document.getElementById('sSub');
+  btn.disabled = true; btn.textContent = 'Creating account...'; setMsg('', '');
+
+  var auth = await sc.auth.signUp({ email: email, password: pass, options: { data: { full_name: name } } });
+  var userId = (auth.data && auth.data.user) ? auth.data.user.id : null;
+  var haveSession = !!(auth.data && auth.data.session);
+  if (auth.error) {
+    var lo = (auth.error.message || '').toLowerCase();
+    if (lo.indexOf('already registered') !== -1 || lo.indexOf('already been registered') !== -1 || lo.indexOf('user already') !== -1) {
+      var si = await sc.auth.signInWithPassword({ email: email, password: pass });
+      if (si.error) { setMsg('That email is already registered. Try signing in, or use a different email.', 'er'); btn.disabled = false; btn.textContent = 'Start Free Trial'; return; }
+      userId = si.data.user.id; haveSession = true;
+      var exist = await sc.from('schools').select('id').eq('owner_id', userId).limit(1);
+      if (exist.data && exist.data.length) { window.location.href = 'dashboard.html'; return; }
+    } else { setMsg(auth.error.message, 'er'); btn.disabled = false; btn.textContent = 'Start Free Trial'; return; }
+  }
+  
+  // §SIGNUP-HARDENING — school creation runs server-side (register-school EF):
+  // owner_id from the verified session (not client-supplied), race-safe unique slug
+  // (DB-enforced, not a client random guess), tier/trial set server-side. Needs the
+  // new user's session; with email-confirmation ON there's no session yet, so we
+  // defer to the confirm-then-sign-in path below (the EF is idempotent on retry).
+  if (haveSession) {
+    var _sess = await sc.auth.getSession();
+    var _tok = (_sess.data && _sess.data.session) ? _sess.data.session.access_token : SKEY;
+    var reg = await fetch(SURL + '/functions/v1/register-school', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _tok },
+      body: JSON.stringify({ school_name: school, email: email })
+    });
+    var regData = await reg.json().catch(function () { return {}; });
+    if (!reg.ok || !regData.ok) {
+      setMsg('Signup failed: ' + ((regData && regData.error) || 'could not create your school') + ' You can retry with the same email to finish setup.', 'er');
+      btn.disabled = false; btn.textContent = 'Start Free Trial';
+      return;
+    }
+  }
+
+  btn.textContent = 'Setting up...';
+  setMsg('Account created. Setting up your free trial...', 'ok');
+  setTimeout(function () {
+    // Email confirmation off -> session exists -> straight into the dashboard.
+    // Email confirmation on  -> no session yet -> ask them to confirm first.
+    if (haveSession) {
+      window.location.href = 'dashboard.html';
+    } else {
+      setMsg('Account created. Check your email to confirm your address, then sign in.', 'ok');
+      btn.disabled = false; btn.textContent = 'Start Free Trial';
+    }
+  }, 1200);
+}
+
+document.getElementById('overlay').addEventListener('click', function (e) {
+  if (e.target === this) closeModal();
+});
+
+sc.auth.getSession().then(function (r) {
+  if (r.data.session) window.location.href = 'dashboard.html';
+});
+</script>
+
+</body>
+</html>
