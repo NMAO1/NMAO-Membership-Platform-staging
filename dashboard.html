@@ -2199,7 +2199,7 @@
           <button class="profile-tab" id="tab-promotions"  onclick="switchProfileTab('promotions')">Belt History</button>
           <button class="profile-tab" id="tab-notes"       onclick="switchProfileTab('notes')">Notes</button>
           <button class="profile-tab" id="tab-messages"    onclick="switchProfileTab('messages')">Messages</button>
-          <button class="profile-tab" id="tab-financial"   onclick="switchProfileTab('financial')">Financial</button>
+          <button class="profile-tab" id="tab-financial"   onclick="switchProfileTab('financial')">Billing</button>
         </div>
         <div id="profileTabAttendance"><div id="profileAttendanceList" style="display:flex;flex-direction:column;gap:0.5rem"></div></div>
         <div id="profileTabSessions" style="display:none">
@@ -2223,8 +2223,19 @@
           <div id="profileMsgHistory" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
         </div>
         <div id="profileTabFinancial" style="display:none">
-  <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Payment History</div>
-          <div id="profilePaymentHistory" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+          <!-- §BILLING-TAB — all memberships (past/present/future) + upcoming & paid payments -->
+          <div style="margin-bottom:1.5rem">
+            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Memberships &amp; Plans</div>
+            <div id="billingMembershipsList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
+          </div>
+          <div style="margin-bottom:1.5rem">
+            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Upcoming Payments</div>
+            <div id="billingUpcomingList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Paid History</div>
+            <div id="profilePaymentHistory" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+          </div>
         </div>
       </div>
       <!-- §DSAR-DANGER-ZONE — permanent GDPR/CCPA erasure. Deliberately at the bottom, separated
@@ -7755,7 +7766,7 @@ async function replaceStudentCard(sid){
       body: JSON.stringify({
         school_id: SID,
         student_id: sid,
-        success_url: window.location.origin + window.location.pathname + '?card_updated=1',
+        success_url: window.location.origin + window.location.pathname + '?card_updated=1&student=' + sid,
         cancel_url: window.location.origin + window.location.pathname + '?card_update_cancelled=1',
       }),
     });
@@ -8271,7 +8282,7 @@ async function openStudentProfile(sid) {
   await loadProfileAttendance(sid);
   await loadPromotionHistory(sid);
   await loadMessageHistory(sid);
-  await loadProfilePaymentHistory(sid);
+  await loadProfileBilling(sid);
   await loadStudentSessions(sid);
   await loadProfileCardOnFile(sid);
   await buildProfileVitals(sid);
@@ -8834,6 +8845,90 @@ async function loadProfilePaymentHistory(sid){
     el.innerHTML=data.map(function(p){var dt=new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border)"><div><div style="font-size:0.85rem;color:var(--white)">'+(typeLabels[p.type]||p.type||'Payment')+'</div><div style="font-size:0.72rem;color:var(--muted)">'+(p.description||'')+' \u00B7 '+dt+'</div></div><div style="font-size:0.88rem;color:var(--gold)">$'+parseFloat(p.amount||0).toFixed(2)+'</div></div>';}).join('');
   }catch(e){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">Payment history unavailable.</div>';}
 }
+
+// §BILLING-TAB — all memberships (past/present/future) + upcoming (Stripe-accurate where linked) + paid.
+async function loadProfileBilling(sid){
+  await loadProfilePaymentHistory(sid);        // Paid History (existing)
+  await loadProfileAllMemberships(sid);        // Memberships & Plans (all statuses)
+  await loadProfileUpcomingPayments(sid);      // Upcoming Payments
+}
+
+async function loadProfileAllMemberships(sid){
+  var el=document.getElementById('billingMembershipsList'); if(!el) return;
+  try{
+    var r=await sb.from('student_memberships')
+      .select('*, memberships(name,billing_type,price,billing_length,billing_unit,class_limit_type,class_limit_count)')
+      .eq('student_id',sid).eq('school_id',SID).order('created_at',{ascending:false});
+    var data=r.data||[];
+    if(!data.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">No memberships on record.</div>'; return; }
+    var today=localDateStr(new Date());
+    function bucket(sm){
+      if(sm.start_date && sm.start_date>today) return 'future';
+      if(['active','trialing','paused','past_due'].indexOf(sm.status)!==-1) return 'current';
+      return 'past';
+    }
+    var groups={current:[],future:[],past:[]};
+    data.forEach(function(sm){ groups[bucket(sm)].push(sm); });
+    var html='';
+    [['current','Current'],['future','Upcoming'],['past','Past']].forEach(function(g){
+      var arr=groups[g[0]]; if(!arr.length) return;
+      html+='<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.35rem 0 0.1rem">'+g[1]+'</div>';
+      html+=arr.map(renderBillingMembershipRow).join('');
+    });
+    el.innerHTML=html;
+  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Membership data unavailable.</div>'; }
+}
+
+function renderBillingMembershipRow(sm){
+  var m=sm.memberships; var name=m?m.name:'--';
+  var price=m?smPriceLabel(m):'--';
+  var cl=m?smClassLine(m):'';
+  var bm=sm.billing_method||(sm.autopay?'autopay':'');
+  var bmLabel={autopay:'Autopay',external:'External',cash:'Cash',comp:'Comp'}[bm]||'';
+  var packLine=sm.is_class_pack?('<div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem">'+(sm.classes_remaining!=null?sm.classes_remaining:'?')+' classes remaining</div>'):'';
+  return '<div onclick="openMembershipDetail(\''+sm.id+'\')" style="cursor:pointer;background:var(--black);border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.85rem">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem"><div style="font-size:0.9rem;color:var(--white);font-weight:600">'+name+'</div>'+smStatusPill(sm.status)+'</div>'+
+    '<div style="font-size:0.78rem;color:var(--gold);margin-top:0.15rem">'+price+(cl?(' · '+cl):'')+(bmLabel?(' · '+bmLabel):'')+'</div>'+
+    smTermLine(sm)+packLine+
+    '<div style="font-size:0.66rem;color:var(--muted);margin-top:0.3rem"><i class="fa-solid fa-circle-info" style="margin-right:0.3rem"></i>View details</div>'+
+  '</div>';
+}
+
+async function loadProfileUpcomingPayments(sid){
+  var el=document.getElementById('billingUpcomingList'); if(!el) return;
+  el.innerHTML='<div style="color:var(--muted);font-size:0.8rem"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Checking upcoming charges…</div>';
+  try{
+    var r=await sb.from('student_memberships')
+      .select('id,status,price,autopay,billing_method,stripe_subscription_id,cycle_end_date,first_charge_date,start_date,is_class_pack, memberships(name,billing_type,class_limit_type)')
+      .eq('student_id',sid).eq('school_id',SID).in('status',['active','trialing','past_due']);
+    var mems=(r.data||[]).filter(function(sm){ return !sm.is_class_pack && sm.memberships && sm.memberships.class_limit_type!=='class_pack' && INTERVAL_MAP[sm.memberships.billing_type]; });
+    if(!mems.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">No recurring plans — nothing scheduled.</div>'; return; }
+    // Stripe-accurate upcoming for any linked subscriptions (falls back to a scheduled estimate below).
+    var stripeMap={};
+    if(mems.some(function(sm){return sm.stripe_subscription_id;})){
+      try{
+        var resp=await fetch(SURL+'/functions/v1/get-upcoming-invoices',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({school_id:SID,student_id:sid})});
+        var jd=await resp.json();
+        (jd.upcoming||[]).forEach(function(u){ if(u&&u.membership_id&&!u.error&&u.amount_cents!=null) stripeMap[u.membership_id]=u; });
+      }catch(e){}
+    }
+    el.innerHTML=mems.map(function(sm){
+      var m=sm.memberships; var su=stripeMap[sm.id]; var amountStr,dateStr,tag;
+      if(su){
+        amountStr='$'+(su.amount_cents/100).toFixed(2);
+        dateStr=su.next_date?smDateLabel((''+su.next_date).substring(0,10)):'—';
+        tag='<span style="font-size:0.58rem;color:#7DAAD4;border:1px solid #7DAAD466;border-radius:999px;padding:0.08rem 0.42rem;margin-left:0.4rem">via Stripe</span>';
+      } else {
+        var d=sm.cycle_end_date||sm.first_charge_date||sm.start_date;
+        amountStr=sm.price!=null?('$'+parseFloat(sm.price).toFixed(2)):'—';
+        dateStr=d?smDateLabel(d):'—';
+        tag='<span style="font-size:0.58rem;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:0.08rem 0.42rem;margin-left:0.4rem">scheduled</span>';
+      }
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border)"><div><div style="font-size:0.85rem;color:var(--white)">'+(m?m.name:'Membership')+tag+'</div><div style="font-size:0.72rem;color:var(--muted)">Next charge · '+dateStr+'</div></div><div style="font-size:0.88rem;color:var(--gold)">'+amountStr+'</div></div>';
+    }).join('');
+  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Upcoming payments unavailable.</div>'; }
+}
+
 function toggleManualPaymentForm(){
   var f = document.getElementById('manualPaymentForm');
   var openNow = f.style.display === 'none';
@@ -16082,9 +16177,22 @@ function isLight(hex){
 // ─────────────────────────────── BOOT ───────────────────────────────
 
 // §INIT — attach Flatpickr once init finishes and the DOM is populated
+// §CARD-RETURN — after the staff "Add Card" flow returns (?card_updated=1&student=<sid>),
+// reopen that student's profile, refresh Card on File, toast, and clean the URL.
+function handleCardUpdateReturn(){
+  try{
+    var qp=new URLSearchParams(window.location.search);
+    if(qp.get('card_updated')!=='1') return;
+    var sid=qp.get('student');
+    try{ var u=new URL(location.href); u.searchParams.delete('card_updated'); u.searchParams.delete('student'); history.replaceState(null,'',u.pathname+u.search+u.hash); }catch(e){}
+    if(sid && typeof openStudentProfile==='function'){ openStudentProfile(sid).then(function(){ try{ loadProfileCardOnFile(sid); }catch(e){} }); }
+    try{ if(window.showToast) showToast('Card saved.','ok'); }catch(e){}
+  }catch(e){}
+}
 init().then(function(){
   if(window.attachFlatpickrGlobally) window.attachFlatpickrGlobally();
   try { handleSmsDeepLink(); } catch(e) { console.error('sms deep-link:', e); }
+  try { handleCardUpdateReturn(); } catch(e) { console.error('card return:', e); }
 });
 setTimeout(initCalView, 200);
 
