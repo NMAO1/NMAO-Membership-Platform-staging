@@ -2179,14 +2179,8 @@
           </div>
 
           <div style="border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem">
-            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-credit-card" style="color:var(--gold)"></i>Card On File <button class="help-hint-inline" onclick="openHelpPopover('profile.sec_billing',this)" title="Help">?</button></div><div style="font-size:0.68rem;color:var(--muted);font-weight:normal;text-transform:none;letter-spacing:0;margin:-0.5rem 0 0.85rem">The saved card and billing day for this member.</div>
+            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-credit-card" style="color:var(--gold)"></i>Card On File <button class="help-hint-inline" onclick="openHelpPopover('profile.sec_billing',this)" title="Help">?</button></div><div style="font-size:0.68rem;color:var(--muted);font-weight:normal;text-transform:none;letter-spacing:0;margin:-0.5rem 0 0.85rem">The saved card used to charge this member.</div>
             <div id="profileCardOnFile" style="font-size:0.82rem;color:var(--muted);font-style:italic">Loading...</div>
-            <div style="border-top:1px solid var(--border);margin:0.9rem 0"></div>
-            <div style="font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem">Billing Day Override</div>
-            <select id="profileAutopayDay" style="background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:var(--font-ui);font-size:0.88rem;padding:0.55rem 0.75rem;width:100%"><option value="">Use Membership Default</option><option value="anniversary">Anniversary Date</option><option value="1">1st of Month</option><option value="15">15th of Month</option><option value="custom">Custom Day</option></select>
-            <div id="profileAutopayCustomDay" style="display:none;margin-top:0.5rem"><div class="field"><label>Day of Month (1-28)</label><input type="number" id="profileAutopayCustomNum" min="1" max="28" placeholder="e.g. 20" /></div></div>
-            <button class="panel-action" style="font-size:0.72rem;margin-top:0.5rem" onclick="saveAutopayOverride()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-            <p class="form-msg" id="autopayOverrideMsg"></p>
           </div>
 
           <!-- §BILLS-PAYMENTS tile — matches the Guardians/Billing tiles; bills + upcoming + Make a Payment -->
@@ -2241,7 +2235,6 @@
           <p class="form-msg" id="profileMsgStatus"></p>
           <div id="profileMsgHistory" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
         </div>
-        <div id="profileTabFinancial" style="display:none"></div>
       </div>
       <!-- §DSAR-DANGER-ZONE — permanent GDPR/CCPA erasure. Deliberately at the bottom, separated
            from the everyday soft-delete in the header, and behind a two-step confirm. -->
@@ -8286,10 +8279,6 @@ async function openStudentProfile(sid) {
   await loadProfileMemberships(sid);
   await loadStudentCredit(sid);
   await loadProfileTags(sid);
-  if (s.autopay_day_override) {
-    var asel=document.getElementById('profileAutopayDay');
-    if (asel) { if(['anniversary','1','15'].includes(s.autopay_day_override)){asel.value=s.autopay_day_override;}else{asel.value='custom';document.getElementById('profileAutopayCustomDay').style.display='block';document.getElementById('profileAutopayCustomNum').value=s.autopay_day_override;} }
-  }
   var beltProg = (s.programs && s.programs.belt_system==='Belt Progression' && s.programs.belt_system_id) ? s.programs : null;
   if (!beltProg) {
     var _mids = [];
@@ -8664,16 +8653,6 @@ function renderProfileTags() {
 async function addTagToStudent() { var tagId=document.getElementById('profileTagAdd').value; if(!tagId||!currentProfileStudent) return; var already=currentProfileTags.find(function(st){return st.tags&&st.tags.id===tagId;}); if(already){document.getElementById('profileTagAdd').value='';return;} var r=await sb.from('student_tags').insert({school_id:SID,student_id:currentProfileStudent.id,tag_id:tagId}); if(!r.error) await loadProfileTags(currentProfileStudent.id); document.getElementById('profileTagAdd').value=''; }
 async function removeTagFromStudent(stid) { await sb.from('student_tags').delete().eq('id',stid); await loadProfileTags(currentProfileStudent.id); }
 
-async function saveAutopayOverride() {
-  if (!currentProfileStudent) return;
-  var val=document.getElementById('profileAutopayDay').value; var override=val;
-  if (val==='custom') override=document.getElementById('profileAutopayCustomNum').value;
-  if (!override) { setMsg('autopayOverrideMsg','Select a billing day.','error'); return; }
-  setMsg('autopayOverrideMsg','Saving...','');
-  var r=await sb.from('students').update({autopay_day_override:override}).eq('id',currentProfileStudent.id);
-  if(r.error){setMsg('autopayOverrideMsg',r.error.message,'error');}else{setMsg('autopayOverrideMsg','Saved!','success');setTimeout(function(){document.getElementById('autopayOverrideMsg').textContent='';},2000);}
-}
-
 // §SETUP-LINK — sends a branded password-SETUP link (recovery type) via the
 // send-portal-invite pipeline, deliverable by EMAIL or TEXT. Replaces the old
 // signInWithOtp auto-login magic link (which died in mobile in-app webviews).
@@ -8984,16 +8963,6 @@ async function sendStudentMessage(){
     }
   }catch(e){setMsg('profileMsgStatus','Error: '+e.message,'error');}
 }
-async function loadProfilePaymentHistory(sid){
-  var el=document.getElementById('profilePaymentHistory');
-  try{
-    var r=await sb.from('payments').select('*').eq('student_id',sid).eq('school_id',SID).order('created_at',{ascending:false}).limit(20);
-    var data=r.data||[];
-    if(!data.length){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem;text-align:center;padding:1.5rem">No payment records yet.</div>';return;}
-    var typeLabels={membership:'Membership',retail_sale:'Retail',session:'Session',session_pack:'Session Pack',belt_test:'Belt Test',other:'Other'};
-    el.innerHTML=data.map(function(p){var dt=new Date(p.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border)"><div><div style="font-size:0.85rem;color:var(--white)">'+(typeLabels[p.type]||p.type||'Payment')+'</div><div style="font-size:0.72rem;color:var(--muted)">'+(p.description||'')+' \u00B7 '+dt+'</div></div><div style="font-size:0.88rem;color:var(--gold)">$'+parseFloat(p.amount||0).toFixed(2)+'</div></div>';}).join('');
-  }catch(e){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">Payment history unavailable.</div>';}
-}
 
 // §BILLING-TAB — all memberships (past/present/future) + upcoming (Stripe-accurate where linked) + paid.
 // §BILLS-PAYMENTS — collapsible bills & payments ledger + Make a Payment (its own profile section).
@@ -9272,7 +9241,7 @@ async function populateManualMembershipDropdown() {
   setMsg('manualPayMsg', type === 'membership' ? 'Payment recorded and membership activated!' : 'Payment recorded!', 'success');
   document.getElementById('manualPayAmt').value = '0';
   document.getElementById('manualPayNote').value = '';
-  await loadProfilePaymentHistory(currentProfileStudent.id);
+  if (typeof loadBillsTile === 'function') await loadBillsTile(currentProfileStudent.id);
   if (type === 'membership') {
     await loadProfileMemberships(currentProfileStudent.id);
     await loadStudents();
@@ -10005,7 +9974,7 @@ function renderImportReview(){
 
   if(p.families.length){
     h+=impSectionHead('Potential families ('+p.families.length+')');
-    h+='<div style="margin-bottom:1rem">'+p.families.map(function(f,fi){ return renderFamilyCard(f,fi,p); }).join('')+'</div>';
+    h+='<div style="margin-bottom:1rem">'+p.families.map(function(f,fi){ return renderImportFamilyCard(f,fi,p); }).join('')+'</div>';
   }
 
   h+=renderImportPlanBeltReview();
@@ -10052,7 +10021,7 @@ function impRadio(idx,val,label){
 }
 function setImportRes(idx,val){ if(importPlan&&importPlan.rows[idx]){ importPlan.rows[idx].resolution=val; } }
 
-function renderFamilyCard(f,fi,p){
+function renderImportFamilyCard(f,fi,p){
   var h='<div style="border:1px solid var(--border);border-left:3px solid '+(f.confidence==='strong'?'#4C8CE2':'var(--muted)')+';padding:0.6rem 0.75rem;margin-bottom:0.5rem">';
   h+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">';
   h+='<input type="checkbox" '+(f.accepted?'checked':'')+' onchange="toggleImportFamily('+fi+',this.checked)">';
@@ -11473,7 +11442,7 @@ function checkoutRefreshAfterSale(){
   var onProfile = (typeof currentProfileStudent !== 'undefined' && currentProfileStudent && currentProfileStudent.id === sid);
   if (onProfile){
     if (typeof loadProfileMemberships === 'function') loadProfileMemberships(sid);
-    if (typeof loadProfilePaymentHistory === 'function') loadProfilePaymentHistory(sid);
+    if (typeof loadBillsTile === 'function') loadBillsTile(sid);
     if (typeof buildProfileVitals === 'function') buildProfileVitals(sid);
   }
   if (typeof loadStudents === 'function') loadStudents();
@@ -14427,7 +14396,6 @@ document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='alertAudience')    document.getElementById('alertTagField').style.display=e.target.value==='tag'?'block':'none';   
   if(e.target&&e.target.id==='alertScheduleDate'){var _sb=document.getElementById('alertSendBtn');if(_sb)_sb.innerHTML=e.target.value?'<i class="fa-solid fa-clock"></i> Schedule':'<i class="fa-solid fa-paper-plane"></i> Send Now';}  
   if(e.target&&e.target.id==='commAudience')     toggleTagAudience();
-  if(e.target&&e.target.id==='profileAutopayDay')document.getElementById('profileAutopayCustomDay').style.display=e.target.value==='custom'?'block':'none';
   if(e.target&&e.target.id==='memAutopayDay')    toggleMemCustomDay();
   if(e.target&&e.target.id==='btEligibilityMode')document.getElementById('btEligibilityCriteria')&&(document.getElementById('btEligibilityCriteria').style.display=e.target.value!=='manual'?'block':'none');
 });
@@ -16053,7 +16021,6 @@ var ROSTER_COLS = [
   {key:'joined',     label:'Joined',            group:'Membership', def:true,  get:function(s,iso){return _rDate(s.created_at,iso);}},
   {key:'start_date', label:'Start Date',        group:'Membership', def:false, get:function(s,iso){return _rDate(s.start_date,iso);}},
   {key:'mem_end',    label:'Membership Ends',   group:'Membership', def:false, get:function(s,iso){return _rDate(s.membership_end_date,iso);}},
-  {key:'autopay',    label:'Billing Day',       group:'Membership', def:false, get:function(s){return s.autopay_day_override||'';}},
 
   {key:'total_paid', label:'Lifetime Paid',     group:'Money',      def:false, get:function(s,iso){var a=rosterAggById[s.id]; return a?_rMoney(a.total_paid,iso):'';}},
   {key:'last_paid',  label:'Last Payment',      group:'Money',      def:false, get:function(s,iso){var a=rosterAggById[s.id]; return a?_rMoney(a.last_payment_amount,iso):'';}},
