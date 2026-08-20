@@ -11379,7 +11379,8 @@ async function checkoutCashMembership(){
     program_id: programId,
     status: 'active',
     started_at: nowIso,
-    start_date: today
+    start_date: today,
+    billing_method: 'cash'   // §GUARDRAIL — cash checkout; never leave billing_method blank
   });
 }
 
