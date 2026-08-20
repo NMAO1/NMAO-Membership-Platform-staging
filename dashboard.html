@@ -2190,33 +2190,26 @@
             <p class="form-msg" id="autopayOverrideMsg"></p>
           </div>
 
-        </div>
-      </div>
+          <!-- §BILLS-PAYMENTS tile — matches the Guardians/Billing tiles; bills + upcoming + Make a Payment -->
+          <div style="border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem">
+            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--gold)"></i>Bills &amp; Payments</div>
+            <div id="billsSummary" style="font-size:0.68rem;color:var(--muted);margin-bottom:0.75rem"></div>
+            <div id="billsUpcomingWrap" style="margin-bottom:0.75rem"></div>
+            <div id="billsList" style="max-height:280px;overflow-y:auto"></div>
+            <button class="panel-action gold" style="font-size:0.72rem;margin-top:0.85rem" onclick="openMakePaymentPanel()"><i class="fa-solid fa-cash-register" style="margin-right:0.35rem"></i>Make a Payment</button>
+            <div id="makePaymentPanel" style="display:none;margin-top:0.85rem;border:1px solid var(--gold);border-radius:8px;padding:0.85rem 0.9rem;background:var(--black)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem"><div style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)">Make a Payment</div><button onclick="closeMakePaymentPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fa-solid fa-xmark"></i></button></div>
+              <div style="font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Payment Amount</div>
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;cursor:pointer"><input type="radio" name="mpAmt" value="current" checked onchange="mpAmtChange()"><span style="font-size:0.82rem;color:var(--white)">Amount due now <span id="mpCurrentAmt" style="color:var(--gold)"></span></span></label>
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;cursor:pointer"><input type="radio" name="mpAmt" value="all" onchange="mpAmtChange()"><span style="font-size:0.82rem;color:var(--white)">Due + next charge <span id="mpAllAmt" style="color:var(--gold)"></span></span></label>
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.55rem;cursor:pointer;flex-wrap:wrap"><input type="radio" name="mpAmt" value="other" onchange="mpAmtChange()"><span style="font-size:0.82rem;color:var(--white)">Other</span><span style="color:var(--muted)">$</span><input type="number" id="mpOtherInput" step="0.01" min="0" placeholder="0.00" oninput="var o=document.querySelector('input[name=mpAmt][value=other]');if(o)o.checked=true;mpAmtChange()" style="width:90px;background:var(--surface);border:1px solid var(--border);color:var(--white);padding:0.3rem 0.5rem;font-family:var(--font-ui)"></label>
+              <div style="font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.65rem 0 0.5rem">Payment Method</div>
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;cursor:pointer"><input type="radio" name="mpMethod" value="card" checked><span id="mpCardLabel" style="font-size:0.82rem;color:var(--white)">Card on file</span></label>
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;flex-wrap:wrap"><input type="radio" name="mpMethod" value="offline"><span style="font-size:0.82rem;color:var(--white)">Offline</span><select id="mpOfflineType" style="background:var(--surface);border:1px solid var(--border);color:var(--white);padding:0.25rem 0.4rem;font-size:0.78rem;font-family:var(--font-ui)"><option value="cash">Cash</option><option value="check">Check</option><option value="other">Other</option></select></label>
+              <div style="margin-top:0.85rem"><button class="panel-action gold" id="mpSubmitBtn" style="font-size:0.72rem" onclick="submitMakePayment()"><i class="fa-solid fa-bolt" style="margin-right:0.4rem"></i>Charge <span id="mpSubmitAmt"></span></button><p id="mpMsg" class="form-msg" style="margin-top:0.4rem"></p></div>
+            </div>
+          </div>
 
-      <!-- §BILLS-PAYMENTS — its own collapsible full-width section beneath the Billing tile -->
-      <div style="border-bottom:1px solid var(--border)">
-        <button onclick="toggleBillsSection()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:1.1rem 1.5rem;cursor:pointer">
-          <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);font-weight:600"><i class="fa-solid fa-file-invoice-dollar"></i> Bills &amp; Payments</span>
-          <span style="display:flex;align-items:center;gap:0.85rem"><span id="billsSummary" style="font-size:0.72rem;color:var(--muted)"></span><i class="fa-solid fa-chevron-down" id="billsCaret" style="transition:transform 0.2s;color:var(--muted)"></i></span>
-        </button>
-        <div id="billsSectionBody" style="display:none;padding:0 1.5rem 1.5rem">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
-            <button class="btn-sm gold" onclick="openMakePaymentPanel()"><i class="fa-solid fa-cash-register" style="margin-right:0.3rem"></i>Make a Payment</button>
-          </div>
-          <div id="billsUpcomingWrap" style="margin-bottom:1.25rem"></div>
-          <div id="billsList"></div>
-          <!-- Make a Payment inline panel -->
-          <div id="makePaymentPanel" style="display:none;margin-top:1.25rem;border:1px solid var(--gold);border-radius:8px;padding:1rem 1.1rem;background:var(--surface)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem"><div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)">Make a Payment</div><button onclick="closeMakePaymentPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fa-solid fa-xmark"></i></button></div>
-            <div style="font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.55rem">Payment Amount</div>
-            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpAmt" value="current" checked onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Amount due now <span id="mpCurrentAmt" style="color:var(--gold)"></span></span></label>
-            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpAmt" value="all" onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Due + next charge <span id="mpAllAmt" style="color:var(--gold)"></span></span></label>
-            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;cursor:pointer"><input type="radio" name="mpAmt" value="other" onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Other amount</span><span style="color:var(--muted)">$</span><input type="number" id="mpOtherInput" step="0.01" min="0" placeholder="0.00" oninput="var o=document.querySelector('input[name=mpAmt][value=other]');if(o)o.checked=true;mpAmtChange()" style="width:100px;background:var(--black);border:1px solid var(--border);color:var(--white);padding:0.3rem 0.5rem;font-family:var(--font-ui)"></label>
-            <div style="font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.75rem 0 0.55rem">Payment Method</div>
-            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpMethod" value="card" checked><span id="mpCardLabel" style="font-size:0.85rem;color:var(--white)">Card on file</span></label>
-            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer"><input type="radio" name="mpMethod" value="offline"><span style="font-size:0.85rem;color:var(--white)">Offline payment</span><select id="mpOfflineType" style="background:var(--black);border:1px solid var(--border);color:var(--white);padding:0.25rem 0.4rem;font-size:0.8rem;font-family:var(--font-ui)"><option value="cash">Cash</option><option value="check">Check</option><option value="other">Other</option></select></label>
-            <div style="display:flex;align-items:center;gap:0.75rem;margin-top:1rem;flex-wrap:wrap"><button class="panel-action gold" id="mpSubmitBtn" onclick="submitMakePayment()"><i class="fa-solid fa-bolt" style="margin-right:0.4rem"></i>Charge <span id="mpSubmitAmt"></span></button><span id="mpMsg" class="form-msg"></span></div>
-          </div>
         </div>
       </div>
 
@@ -8295,7 +8288,7 @@ async function openStudentProfile(sid) {
   await loadProfileAttendance(sid);
   await loadPromotionHistory(sid);
   await loadMessageHistory(sid);
-  await loadBillsSummary(sid);
+  await loadBillsTile(sid);
   await loadStudentSessions(sid);
   await loadProfileCardOnFile(sid);
   await buildProfileVitals(sid);
@@ -8865,11 +8858,10 @@ async function loadProfilePaymentHistory(sid){
 // future-bill ledger, so "upcoming" = the real next charge only (Stripe-accurate where linked).
 var _billsCtx = { sid:null, familyIds:[], nameById:{}, pastDueCents:0, upcomingCents:0, loaded:false };
 
-// Light header summary loaded when the profile opens; the full list loads lazily on first expand.
-async function loadBillsSummary(sid){
+// Loaded when the profile opens. The tile is always shown (like Guardians/Billing), so it renders
+// the summary + upcoming + full bills list immediately.
+async function loadBillsTile(sid){
   _billsCtx = { sid:sid, familyIds:[sid], nameById:{}, pastDueCents:0, upcomingCents:0, loaded:false };
-  var body=document.getElementById('billsSectionBody'); if(body) body.style.display='none';
-  var caret=document.getElementById('billsCaret'); if(caret) caret.style.transform='';
   var mp=document.getElementById('makePaymentPanel'); if(mp) mp.style.display='none';
   var sumEl=document.getElementById('billsSummary'); if(sumEl) sumEl.innerHTML='';
   try{
@@ -8882,15 +8874,7 @@ async function loadBillsSummary(sid){
       if(lastPaid) bits.push('Last payment '+smDateLabel((lastPaid.created_at||'').substring(0,10)));
       sumEl.innerHTML=bits.join(' · '); }
   }catch(e){}
-}
-
-function toggleBillsSection(){
-  var body=document.getElementById('billsSectionBody'); var caret=document.getElementById('billsCaret');
-  if(!body) return;
-  var open = body.style.display==='none';
-  body.style.display = open?'block':'none';
-  if(caret) caret.style.transform = open?'rotate(180deg)':'';
-  if(open && !_billsCtx.loaded) loadBillsSection(_billsCtx.sid);
+  await loadBillsSection(sid);
 }
 
 async function loadBillsSection(sid){
@@ -9028,11 +9012,7 @@ async function submitMakePayment(){
       }
       msg.textContent='Charged $'+(((jd.gross_charged_cents!=null?jd.gross_charged_cents:cents))/100).toFixed(2)+(jd.last4?(' to card ····'+jd.last4):'')+'.'; msg.className='form-msg success';
     }
-    _billsCtx.loaded=false;
-    await loadBillsSummary(_billsCtx.sid);
-    var body=document.getElementById('billsSectionBody'); if(body) body.style.display='block';
-    var caret=document.getElementById('billsCaret'); if(caret) caret.style.transform='rotate(180deg)';
-    await loadBillsSection(_billsCtx.sid);
+    await loadBillsTile(_billsCtx.sid);
     if(window.showToast) showToast('Payment recorded.','ok');
     setTimeout(closeMakePaymentPanel, 1800);
   }catch(e){ msg.textContent=(e&&e.message)||'Payment failed.'; msg.className='form-msg error'; }
