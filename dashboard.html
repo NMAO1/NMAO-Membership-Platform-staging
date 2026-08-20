@@ -9066,6 +9066,19 @@ async function renderBillsList(ids, nameById, isFamily){
   }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Bills unavailable.</div>'; }
 }
 
+// §COMP-NEXT — waive the next Stripe charge for one plan (applies a one-time $0-out credit in Stripe).
+async function compNextBill(smId){
+  if(!confirm('Waive the NEXT bill for this plan?\n\nThe next charge is set to $0 in Stripe (a one-time credit is applied to that invoice). Billing resumes normally the cycle after.')) return;
+  try{
+    var uid=null; try{ var s=await sb.auth.getUser(); uid=(s&&s.data&&s.data.user)?s.data.user.id:null; }catch(e){}
+    var r=await fetch(SURL+'/functions/v1/comp-next-invoice',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({school_id:SID, student_membership_id:smId, applied_by:uid})});
+    var d={}; try{ d=await r.json(); }catch(e){}
+    if(!r.ok||d.error){ alert('Could not comp the bill: '+((d.error||'error').replace(/^[A-Z_]+:\s*/,''))); return; }
+    if(window.showToast) showToast(d.comped_cents>0?('Next bill comped — $'+(d.comped_cents/100).toFixed(2)+' waived in Stripe.'):(d.note||'Next bill is already $0.'),'ok');
+    if(currentProfileStudent && currentProfileStudent.id) await loadBillsTile(currentProfileStudent.id);
+  }catch(e){ alert('Comp failed: '+(e&&e.message?e.message:e)); }
+}
+
 async function renderBillsUpcoming(ids, nameById, isFamily){
   var el=document.getElementById('billsUpcomingWrap'); if(!el) return;
   _billsCtx.upcomingCents=0;
@@ -9092,7 +9105,7 @@ async function renderBillsUpcoming(ids, nameById, isFamily){
       var ap=(sm.billing_method==='autopay'||sm.autopay===true);
       var apBadge='<span style="font-size:0.56rem;font-weight:700;color:'+(ap?'#5A9A6A':'#888888')+';border:1px solid '+(ap?'#5A9A6A':'#888888')+'66;border-radius:999px;padding:0.08rem 0.42rem">'+(ap?'ON':'OFF')+'</span>';
       var person=isFamily?('<span style="color:var(--white)">'+(nameById[sm.student_id]||'')+' · </span>'):'';
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.5rem;border-bottom:1px solid var(--border)"><div><div style="font-size:0.82rem;color:var(--white)">'+person+(m?m.name:'Membership')+' <span style="font-size:0.56rem;color:#7DAAD4;border:1px solid #7DAAD466;border-radius:999px;padding:0.06rem 0.38rem;margin-left:0.3rem">'+tag+'</span></div><div style="font-size:0.7rem;color:var(--muted)">Next charge · '+dstr+' · Autopay '+apBadge+'</div></div><div style="font-size:0.85rem;color:var(--gold)">'+(amt!=null?('$'+amt.toFixed(2)):'—')+'</div></div>';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.5rem;border-bottom:1px solid var(--border)"><div><div style="font-size:0.82rem;color:var(--white)">'+person+(m?m.name:'Membership')+' <span style="font-size:0.56rem;color:#7DAAD4;border:1px solid #7DAAD466;border-radius:999px;padding:0.06rem 0.38rem;margin-left:0.3rem">'+tag+'</span></div><div style="font-size:0.7rem;color:var(--muted)">Next charge · '+dstr+' · Autopay '+apBadge+(su?' · <a onclick="event.stopPropagation();compNextBill(\''+sm.id+'\')" style="color:#7DAAD4;cursor:pointer;text-decoration:underline" title="Waive the next charge — sets it to $0 in Stripe">comp this bill</a>':'')+'</div></div><div style="font-size:0.85rem;color:var(--gold)">'+(amt!=null?('$'+amt.toFixed(2)):'—')+'</div></div>';
     }).join('');
     _billsCtx.upcomingCents=totalCents;
     el.innerHTML='<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.4rem">Upcoming</div>'+rowsHtml;
@@ -11975,9 +11988,10 @@ function renderCancelList(){
     html += '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.7rem">' + kind + statusTag + '</div>';
     var fi = cancelFeeFor(row);
     if (fi.monthsLeft>0){
-      if (fi.fee>0){ html += '<div style="font-size:0.74rem;color:#E2A84C;background:rgba(226,168,76,0.08);border:1px solid rgba(226,168,76,0.3);padding:0.45rem 0.6rem;margin-bottom:0.7rem">Under commitment \u00b7 '+fi.monthsLeft+' mo left. Early-cancel fee: <strong>$'+fi.fee.toFixed(2)+'</strong>'+(row.autoCharge?' (auto-charged to card on file)':' (collect manually)')+'</div>'; }
+      if (fi.fee>0){ html += '<div style="font-size:0.74rem;color:#E2A84C;background:rgba(226,168,76,0.08);border:1px solid rgba(226,168,76,0.3);padding:0.45rem 0.6rem;margin-bottom:0.55rem">Under commitment \u00b7 '+fi.monthsLeft+' mo left. Early-cancel fee: <strong>$'+fi.fee.toFixed(2)+'</strong>'+(row.autoCharge?' (auto-charged to card on file)':' (collect manually)')+'</div>'; }
       else { html += '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.7rem">Under commitment \u00b7 '+fi.monthsLeft+' mo left \u00b7 no early-cancel fee</div>'; }
     }
+    if (fi.fee>0){ html += '<label style="display:flex;align-items:center;gap:0.45rem;font-size:0.76rem;color:#F5F0E8;margin-bottom:0.7rem;cursor:pointer"><input type="checkbox" id="cancelWaive_'+i+'"> Waive the early-cancel fee &mdash; don\u2019t charge it</label>'; }
     html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
     if (row.subId){
       html += '<button class="btn-sm" onclick="cancelConfirm(' + i + ',\'period_end\')">End at period close</button>';
@@ -12001,10 +12015,11 @@ function cancelConfirm(i, when){
   } else {
     msg = 'Cancel ' + row.name + ' at the end of the current billing period? They keep access until then and are not billed again.';
   }
+  var waive = !!(document.getElementById('cancelWaive_'+i) && document.getElementById('cancelWaive_'+i).checked);
   var _fi = cancelFeeFor(row);
-  if (_fi.fee>0){ msg += '\n\nEarly-cancel fee: $'+_fi.fee.toFixed(2)+(row.autoCharge?' will be charged to the card on file.':' will be recorded as owed (collect manually).'); }
+  if (_fi.fee>0){ msg += waive ? ('\n\nEarly-cancel fee of $'+_fi.fee.toFixed(2)+' will be WAIVED — nothing charged.') : ('\n\nEarly-cancel fee: $'+_fi.fee.toFixed(2)+(row.autoCharge?' will be charged to the card on file.':' will be recorded as owed (collect manually).')); }
   if (!window.confirm(msg)) return;
-  cancelMembershipDo(i, when);
+  cancelMembershipDo(i, when, waive);
 }
 
 function setCancelBusy(b){
@@ -12014,7 +12029,7 @@ function setCancelBusy(b){
   for (var i=0;i<btns.length;i++){ btns[i].disabled = b; }
 }
 
-async function cancelMembershipDo(i, when){
+async function cancelMembershipDo(i, when, waive){
   var row = _cancelRows[i];
   if (!row) return;
   setCancelBusy(true);
@@ -12023,7 +12038,9 @@ async function cancelMembershipDo(i, when){
    var successMsg;
     var penaltyNote = '';
     var _fi = cancelFeeFor(row);
-    if (_fi.fee>0){
+    if (_fi.fee>0 && waive){
+      penaltyNote = ' Early-cancel fee of $'+_fi.fee.toFixed(2)+' waived.';
+    } else if (_fi.fee>0){
       var _sid = (currentProfileStudent && currentProfileStudent.id) ? currentProfileStudent.id : null;
       if (row.autoCharge && _sid){
         var _cents = Math.round(_fi.fee*100);
