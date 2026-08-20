@@ -3245,6 +3245,31 @@
 </div>
   
 <!-- §MODAL-POS -->
+<!-- §AUTOPAY — turn-on modal: start mode + date + signup fee + live preview -->
+<div class="modal-overlay" id="autopayModal">
+  <div class="modal" style="width:490px;max-width:95vw">
+    <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:1.1rem 1.4rem;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--white)"><i class="fa-solid fa-bolt" style="color:#4CAF6A;margin-right:0.5rem"></i>Turn on Autopay</div>
+      <button onclick="closeAutopayModal()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div style="padding:1.3rem 1.4rem">
+      <div style="font-size:0.92rem;color:var(--gold);margin-bottom:1rem" id="apPlanName">Plan</div>
+      <div style="font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.55rem;display:flex;align-items:center;gap:0.35rem">Billing start <button class="help-hint-inline" onclick="openHelpPopover('profile.autopay_mode',this)" title="Help">?</button></div>
+      <label style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;cursor:pointer"><input type="radio" name="apMode" value="charge_today" onchange="autopayPreview()" style="margin-top:0.2rem"><span style="font-size:0.84rem;color:#F5F0E8"><b>Prepay today</b> — charge the first month now; recurring starts the next cycle.</span></label>
+      <label style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;cursor:pointer"><input type="radio" name="apMode" value="prorate" onchange="autopayPreview()" style="margin-top:0.2rem"><span style="font-size:0.84rem;color:#F5F0E8"><b>Prorate</b> — charge a partial slice today, full amount on the start date.</span></label>
+      <label style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.85rem;cursor:pointer"><input type="radio" name="apMode" value="defer" checked onchange="autopayPreview()" style="margin-top:0.2rem"><span style="font-size:0.84rem;color:#F5F0E8"><b>Nothing today</b> — the first charge lands on the start date.</span></label>
+      <div class="field" style="margin-bottom:0.75rem"><label>Start / first charge date</label><input type="date" id="apDate" onchange="autopayPreview()" /></div>
+      <label id="apSignupWrap" style="display:none;align-items:center;gap:0.5rem;margin-bottom:0.85rem;cursor:pointer"><input type="checkbox" id="apSignup" onchange="autopayPreview()"><span style="font-size:0.84rem;color:#F5F0E8">Charge <span id="apSignupAmt" style="color:var(--gold)"></span> signup fee today</span> <button class="help-hint-inline" onclick="openHelpPopover('profile.signup_fee',this)" title="Help">?</button></label>
+      <div id="apPreview" style="background:var(--black);border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.85rem;font-size:0.85rem;color:#F5F0E8;margin-bottom:0.85rem"></div>
+      <p class="form-msg" id="apMsg"></p>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <button class="btn-sm" onclick="closeAutopayModal()" style="flex:1">Cancel</button>
+        <button class="panel-action gold" id="apConfirmBtn" onclick="confirmAutopayOn()" style="flex:2"><i class="fa-solid fa-bolt" style="margin-right:0.4rem"></i>Turn on Autopay</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="chargePlanModal">
   <div class="modal" style="width:460px;max-width:95vw">
     <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:1.1rem 1.4rem;display:flex;justify-content:space-between;align-items:center">
@@ -5094,6 +5119,9 @@ var HELP_CONTENT = {
 'profile.sec_progress': { title: 'Progress', purpose: 'Belt rank and progress toward the next test, plus the class tracker showing attendance against their plan allowance.' },
 'profile.sec_memberships': { title: 'Memberships', purpose: 'Active plans and packs for this member, plus admin actions under More actions: switch or comp a plan, issue account credit, or cancel.' },
 'profile.sec_billing': { title: 'Card On File', purpose: 'The card Stripe will charge and an optional billing-day override for this member only. Leave the override on Use Membership Default to follow the plan.' },
+'profile.autopay': { title: 'Autopay', purpose: 'The one switch that turns automatic billing on or off for this plan. ON (green) means a live Stripe subscription is charging the card on file on schedule. OFF (red) pauses it — the subscription is kept and can be resumed anytime; to fully end the plan use Cancel Plan under More actions. You can only turn autopay ON when a card is on file. Example: flip a new member to ON and their $150/mo starts billing automatically; flip a member leaving for the summer to OFF and no charges run until you flip it back.' },
+'profile.autopay_mode': { title: 'Billing start', purpose: 'How the FIRST charge behaves when you turn autopay on. Prepay today: charge one full month now, next charge is the following cycle (e.g. pay $199 today for September, next charge Oct 1). Prorate: charge only the partial days until the start date now, full amount on the date (e.g. ~$78 today for Aug 20-Sep 1, then $199 on Sep 1). Nothing today: $0 now, the first full charge lands on the start date (e.g. $0 today, $199 on Sep 1). All three then recur every month on the start date’s day.' },
+'profile.signup_fee': { title: 'Signup fee', purpose: 'A one-time enrollment fee set on the plan, charged to the card on file today when you turn autopay on — separate from the recurring dues. Example: a $100 signup fee is charged now, and the $199/mo membership begins on the start date. Uncheck it to skip or waive the fee for this member.' },
 
 'payments.discounts': { title: 'Discounts applied', purpose: 'Every staff discount from the last 90 days: how many sales, the total given away, and how many repeat every cycle. Each row in the ledger shows the amount, whether it is one-time or recurring, who applied it, and the reason.' },
 'custom.cc_startdate': { title: 'Start date', purpose: 'The member-since date this membership began. Backdate for a migrated member; blank = today. Record-only, does not affect billing.' },
@@ -7475,6 +7503,7 @@ async function loadProfileCardOnFile(sid){
       body: JSON.stringify({school_id: SID, student_id: sid}),
     });
     var data = await r.json();
+    _profileHasCard = !data.error && !!data.has_card;   // §AUTOPAY — card-gate uses this
     if(data.error){
       el.innerHTML = '<div style="color:var(--muted);font-size:0.78rem">' + data.error + '</div>';
       return;
@@ -8228,6 +8257,7 @@ var r;
 // Student Profile
 async function openStudentProfile(sid) {
   currentProfileStudent=null; currentProfileBeltLevels=[]; currentProfileTags=[];
+  _profileHasCard=null; _profileMemsById={};   // §AUTOPAY — reset card-gate per profile
   document.getElementById('profileName').textContent = 'Loading...';
   document.getElementById('profileMembershipChangeBox').style.display = 'none';
   document.getElementById('studentProfileModal').classList.add('active');
@@ -8368,8 +8398,10 @@ function smTermLine(sm){
 
 async function loadProfileMemberships(sid) {
   try {
-    var r = await sb.from('student_memberships').select('*, memberships(name,billing_type,price,billing_length,billing_unit,class_limit_type,class_limit_count,signup_fee,is_custom)').eq('student_id',sid).eq('status','active');
+    var r = await sb.from('student_memberships').select('*, memberships(name,billing_type,price,billing_length,billing_unit,class_limit_type,class_limit_count,signup_fee,is_custom,prorate_to_first,autopay_day)').eq('student_id',sid).eq('status','active');
     var data = r.data||[];
+    _profileMemsById = {};                                   // §AUTOPAY — cache rows for the toggle
+    data.forEach(function(sm){ _profileMemsById[sm.id]=sm; });
     var el = document.getElementById('profileMembershipslist');
     if (!data.length) {
       el.innerHTML='<div class="profile-info-row"><span class="profile-info-label">Plan</span><span style="color:var(--muted)">No active membership</span></div>';
@@ -8381,10 +8413,122 @@ async function loadProfileMemberships(sid) {
       var price=m?smPriceLabel(m):'--';
       var cl=m?smClassLine(m):'';
       var since=sm.start_date?('Member since '+smDateLabel(sm.start_date)):'';
-      return '<div onclick="openMembershipDetail(\''+sm.id+'\')" style="cursor:pointer;padding:0.6rem 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem"><div style="font-size:0.9rem;color:var(--white);font-weight:600">'+name+'</div>'+pill+'</div><div style="font-size:0.78rem;color:var(--gold);margin-top:0.15rem">'+price+(cl?(' \u00b7 '+cl):'')+'</div>'+(since?'<div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem">'+since+'</div>':'')+smTermLine(sm)+'<div style="font-size:0.68rem;color:var(--muted);margin-top:0.3rem"><i class="fa-solid fa-circle-info" style="margin-right:0.3rem"></i>View details</div><div style="margin-top:0.5rem"><button class="btn-sm gold" onclick="event.stopPropagation();chargeForPlan(\''+sm.id+'\')"><i class="fa-solid fa-cash-register"></i> Charge for this plan</button></div></div>';
+      return '<div onclick="openMembershipDetail(\''+sm.id+'\')" style="cursor:pointer;padding:0.6rem 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem"><div style="font-size:0.9rem;color:var(--white);font-weight:600">'+name+'</div>'+pill+'</div><div style="font-size:0.78rem;color:var(--gold);margin-top:0.15rem">'+price+(cl?(' \u00b7 '+cl):'')+'</div>'+(since?'<div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem">'+since+'</div>':'')+smTermLine(sm)+'<div style="font-size:0.68rem;color:var(--muted);margin-top:0.3rem"><i class="fa-solid fa-circle-info" style="margin-right:0.3rem"></i>View details</div><div style="margin-top:0.55rem;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">'+renderAutopayToggle(sm)+'</div><div style="margin-top:0.5rem"><button class="btn-sm gold" onclick="event.stopPropagation();chargeForPlan(\''+sm.id+'\')"><i class="fa-solid fa-cash-register"></i> Charge for this plan</button></div></div>';
     }).join('');
   } catch(e) { document.getElementById('profileMembershipslist').innerHTML='<div style="color:var(--muted);font-size:0.82rem">No membership data.</div>'; }
 }
+
+// §AUTOPAY — the card-gated autopay toggle (autopay ON ⟺ a live subscription). Calls ensure-subscription.
+var _profileMemsById = {};
+var _profileHasCard = null;   // null = unknown; set true/false when the card tile loads
+var _autopayCtx = null;
+
+function renderAutopayToggle(sm){
+  var on = (sm.autopay===true || sm.billing_method==='autopay');
+  var bg = on ? '#2E7D46' : '#B23A3A';           // loud green / red so state reads at a glance
+  var lbl = on ? 'AUTOPAY ON' : 'AUTOPAY OFF';
+  var icon = on ? 'fa-bolt' : 'fa-bolt-slash';
+  return '<button onclick="event.stopPropagation();toggleAutopay(\''+sm.id+'\','+(!on)+')" '+
+    'style="display:inline-flex;align-items:center;gap:0.4rem;background:'+bg+';color:#fff;border:1px solid rgba(255,255,255,0.18);border-radius:999px;padding:0.32rem 0.8rem;font-size:0.68rem;font-weight:800;letter-spacing:0.05em;cursor:pointer;font-family:var(--font-ui)" '+
+    'title="Click to turn autopay '+(on?'OFF — pause billing':'ON — start billing')+'"><i class="fa-solid '+icon+'"></i>'+lbl+'</button>'+
+    '<button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover(\'profile.autopay\',this)" title="What is autopay?">?</button>';
+}
+
+async function profileCardAvailable(){
+  if(_profileHasCard!==null) return _profileHasCard;
+  try{
+    var sid=currentProfileStudent && currentProfileStudent.id; if(!sid) return false;
+    var r=await fetch(SURL+'/functions/v1/get-student-card',{method:'POST',headers:{'Content-Type':'application/json','Authorization':SC_BEARER},body:JSON.stringify({school_id:SID,student_id:sid})});
+    var d=await r.json(); _profileHasCard=!!(d&&d.has_card); return _profileHasCard;
+  }catch(e){ return false; }
+}
+
+async function toggleAutopay(smId, turnOn){
+  var sm=_profileMemsById[smId]; if(!sm) return;
+  if(turnOn){
+    if(sm.stripe_subscription_id){
+      if(!confirm('Turn autopay ON and resume billing for this plan?')) return;
+      await callEnsureSubscription({student_membership_id:smId, autopay:true}, 'Autopay on — billing resumed.');
+      return;
+    }
+    var has=await profileCardAvailable();
+    if(!has){ alert('Add a card on file before turning autopay on.\n\nUse the "Card On File" tile → Add Card or Send Link, then flip autopay on.'); return; }
+    openAutopayModal(smId);
+  } else {
+    if(!confirm('Turn autopay OFF?\n\nThis PAUSES billing — the subscription is kept and can be resumed anytime. To fully cancel the plan, use Cancel Plan under More actions.')) return;
+    await callEnsureSubscription({student_membership_id:smId, autopay:false}, 'Autopay off — billing paused.');
+  }
+}
+
+function openAutopayModal(smId){
+  var sm=_profileMemsById[smId]; if(!sm) return;
+  var m=sm.memberships||{};
+  _autopayCtx={ smId:smId, priceCents:Math.round((m.price||0)*100), signupCents:Math.round((m.signup_fee||0)*100), name:m.name||'Plan' };
+  document.getElementById('apPlanName').textContent=_autopayCtx.name;
+  var d=new Date(); var nextFirst=new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+(d.getUTCDate()>1?1:0), 1));
+  document.getElementById('apDate').value=nextFirst.toISOString().slice(0,10);
+  document.getElementById('apDate').min=new Date(Date.now()+86400000).toISOString().slice(0,10);
+  var sfWrap=document.getElementById('apSignupWrap');
+  if(_autopayCtx.signupCents>0){ sfWrap.style.display='flex'; document.getElementById('apSignup').checked=true; document.getElementById('apSignupAmt').textContent='$'+(_autopayCtx.signupCents/100).toFixed(2); }
+  else { sfWrap.style.display='none'; document.getElementById('apSignup').checked=false; }
+  var dm=document.querySelector('input[name=apMode][value=defer]'); if(dm) dm.checked=true;
+  document.getElementById('apMsg').textContent='';
+  autopayPreview();
+  document.getElementById('autopayModal').classList.add('active');
+}
+function closeAutopayModal(){ document.getElementById('autopayModal').classList.remove('active'); }
+
+function fmtApDate(s){ if(!s) return '—'; try{ return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return s; } }
+function addMonthStr(s,n){ try{ var d=new Date(s+'T12:00:00'); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }catch(e){ return s; } }
+
+function autopayPreview(){
+  if(!_autopayCtx) return;
+  var mode=(document.querySelector('input[name=apMode]:checked')||{}).value||'defer';
+  var dateStr=document.getElementById('apDate').value;
+  var price=_autopayCtx.priceCents;
+  var signup=(document.getElementById('apSignup').checked?_autopayCtx.signupCents:0);
+  var todayCents=signup, nextStr;
+  if(mode==='charge_today'){ todayCents+=price; nextStr='$'+(price/100).toFixed(2)+' on '+fmtApDate(addMonthStr(dateStr,1)); }
+  else if(mode==='prorate'){ nextStr='prorated slice today + $'+(price/100).toFixed(2)+' on '+fmtApDate(dateStr); }
+  else { nextStr='$'+(price/100).toFixed(2)+' on '+fmtApDate(dateStr); }
+  document.getElementById('apPreview').innerHTML='<b>Today:</b> $'+(todayCents/100).toFixed(2)+(mode==='prorate'?' + a prorated slice':'')+' &nbsp;·&nbsp; <b>Next:</b> '+nextStr;
+}
+
+async function confirmAutopayOn(){
+  if(!_autopayCtx) return;
+  var mode=(document.querySelector('input[name=apMode]:checked')||{}).value||'defer';
+  var dateStr=document.getElementById('apDate').value;
+  var signup=(document.getElementById('apSignup').checked?_autopayCtx.signupCents:0);
+  if(!dateStr){ setMsg('apMsg','Pick a start date.','error'); return; }
+  var btn=document.getElementById('apConfirmBtn'); var orig=btn.innerHTML; btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Setting up…';
+  setMsg('apMsg','','');
+  var uid=null; try{ var s=await sb.auth.getUser(); uid=(s&&s.data&&s.data.user)?s.data.user.id:null; }catch(e){}
+  var idem=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('ap_'+Date.now());
+  var ok=await callEnsureSubscription({student_membership_id:_autopayCtx.smId, autopay:true, start_mode:mode, first_charge_date:dateStr, signup_fee_cents:signup||undefined, applied_by:uid, idempotency_key:idem}, 'Autopay on — subscription created.', function(err){ setMsg('apMsg', err, 'error'); });
+  btn.disabled=false; btn.innerHTML=orig;
+  if(ok) closeAutopayModal();
+}
+
+async function callEnsureSubscription(params, successToast, onError){
+  try{
+    params.school_id=SID;
+    var r=await fetch(SURL+'/functions/v1/ensure-subscription',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify(params)});
+    var d={}; try{ d=await r.json(); }catch(e){}
+    if(!r.ok || d.error){
+      var em=d.error||'Could not update autopay.';
+      if(em.indexOf('NEEDS_CARD')>-1) em='Add a card on file before enabling autopay.';
+      else em=em.replace(/^[A-Z_]+:\s*/,'');
+      if(onError) onError(em); else alert(em);
+      return false;
+    }
+    if(d.signup && d.signup.charged===false){ alert('Subscription created, but the $ signup fee charge did not go through: '+(d.signup.error||'')+'\n\nRetry it via New charge / sell.'); }
+    if(window.showToast) showToast(successToast||'Autopay updated.','ok');
+    if(currentProfileStudent && currentProfileStudent.id){ await loadProfileMemberships(currentProfileStudent.id); try{ _billsCtx.loaded=false; await loadBillsSummary(currentProfileStudent.id); }catch(e){} }
+    return true;
+  }catch(e){ if(onError) onError(e.message||'Network error.'); else alert(e.message||'Network error.'); return false; }
+}
+
 var _chargePlan = null;
 async function chargeForPlan(smid){
   try{
