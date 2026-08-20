@@ -2192,6 +2192,34 @@
 
         </div>
       </div>
+
+      <!-- §BILLS-PAYMENTS — its own collapsible full-width section beneath the Billing tile -->
+      <div style="border-bottom:1px solid var(--border)">
+        <button onclick="toggleBillsSection()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:1.1rem 1.5rem;cursor:pointer">
+          <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);font-weight:600"><i class="fa-solid fa-file-invoice-dollar"></i> Bills &amp; Payments</span>
+          <span style="display:flex;align-items:center;gap:0.85rem"><span id="billsSummary" style="font-size:0.72rem;color:var(--muted)"></span><i class="fa-solid fa-chevron-down" id="billsCaret" style="transition:transform 0.2s;color:var(--muted)"></i></span>
+        </button>
+        <div id="billsSectionBody" style="display:none;padding:0 1.5rem 1.5rem">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+            <button class="btn-sm gold" onclick="openMakePaymentPanel()"><i class="fa-solid fa-cash-register" style="margin-right:0.3rem"></i>Make a Payment</button>
+          </div>
+          <div id="billsUpcomingWrap" style="margin-bottom:1.25rem"></div>
+          <div id="billsList"></div>
+          <!-- Make a Payment inline panel -->
+          <div id="makePaymentPanel" style="display:none;margin-top:1.25rem;border:1px solid var(--gold);border-radius:8px;padding:1rem 1.1rem;background:var(--surface)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem"><div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)">Make a Payment</div><button onclick="closeMakePaymentPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fa-solid fa-xmark"></i></button></div>
+            <div style="font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.55rem">Payment Amount</div>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpAmt" value="current" checked onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Amount due now <span id="mpCurrentAmt" style="color:var(--gold)"></span></span></label>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpAmt" value="all" onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Due + next charge <span id="mpAllAmt" style="color:var(--gold)"></span></span></label>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;cursor:pointer"><input type="radio" name="mpAmt" value="other" onchange="mpAmtChange()"><span style="font-size:0.85rem;color:var(--white)">Other amount</span><span style="color:var(--muted)">$</span><input type="number" id="mpOtherInput" step="0.01" min="0" placeholder="0.00" oninput="var o=document.querySelector('input[name=mpAmt][value=other]');if(o)o.checked=true;mpAmtChange()" style="width:100px;background:var(--black);border:1px solid var(--border);color:var(--white);padding:0.3rem 0.5rem;font-family:var(--font-ui)"></label>
+            <div style="font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.75rem 0 0.55rem">Payment Method</div>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;cursor:pointer"><input type="radio" name="mpMethod" value="card" checked><span id="mpCardLabel" style="font-size:0.85rem;color:var(--white)">Card on file</span></label>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer"><input type="radio" name="mpMethod" value="offline"><span style="font-size:0.85rem;color:var(--white)">Offline payment</span><select id="mpOfflineType" style="background:var(--black);border:1px solid var(--border);color:var(--white);padding:0.25rem 0.4rem;font-size:0.8rem;font-family:var(--font-ui)"><option value="cash">Cash</option><option value="check">Check</option><option value="other">Other</option></select></label>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-top:1rem;flex-wrap:wrap"><button class="panel-action gold" id="mpSubmitBtn" onclick="submitMakePayment()"><i class="fa-solid fa-bolt" style="margin-right:0.4rem"></i>Charge <span id="mpSubmitAmt"></span></button><span id="mpMsg" class="form-msg"></span></div>
+          </div>
+        </div>
+      </div>
+
       <div style="padding:1.5rem">
         <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem;flex-wrap:wrap">
           <button class="profile-tab active" id="tab-attendance" onclick="switchProfileTab('attendance')">Attendance</button>
@@ -2199,7 +2227,6 @@
           <button class="profile-tab" id="tab-promotions"  onclick="switchProfileTab('promotions')">Belt History</button>
           <button class="profile-tab" id="tab-notes"       onclick="switchProfileTab('notes')">Notes</button>
           <button class="profile-tab" id="tab-messages"    onclick="switchProfileTab('messages')">Messages</button>
-          <button class="profile-tab" id="tab-financial"   onclick="switchProfileTab('financial')">Billing</button>
         </div>
         <div id="profileTabAttendance"><div id="profileAttendanceList" style="display:flex;flex-direction:column;gap:0.5rem"></div></div>
         <div id="profileTabSessions" style="display:none">
@@ -2222,21 +2249,7 @@
           <p class="form-msg" id="profileMsgStatus"></p>
           <div id="profileMsgHistory" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
         </div>
-        <div id="profileTabFinancial" style="display:none">
-          <!-- §BILLING-TAB — all memberships (past/present/future) + upcoming & paid payments -->
-          <div style="margin-bottom:1.5rem">
-            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Memberships &amp; Plans</div>
-            <div id="billingMembershipsList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
-          </div>
-          <div style="margin-bottom:1.5rem">
-            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Upcoming Payments</div>
-            <div id="billingUpcomingList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
-          </div>
-          <div>
-            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Paid History</div>
-            <div id="profilePaymentHistory" style="display:flex;flex-direction:column;gap:0.5rem"></div>
-          </div>
-        </div>
+        <div id="profileTabFinancial" style="display:none"></div>
       </div>
       <!-- §DSAR-DANGER-ZONE — permanent GDPR/CCPA erasure. Deliberately at the bottom, separated
            from the everyday soft-delete in the header, and behind a two-step confirm. -->
@@ -8282,7 +8295,7 @@ async function openStudentProfile(sid) {
   await loadProfileAttendance(sid);
   await loadPromotionHistory(sid);
   await loadMessageHistory(sid);
-  await loadProfileBilling(sid);
+  await loadBillsSummary(sid);
   await loadStudentSessions(sid);
   await loadProfileCardOnFile(sid);
   await buildProfileVitals(sid);
@@ -8293,7 +8306,7 @@ async function openStudentProfile(sid) {
 function closeStudentProfile() { document.getElementById('studentProfileModal').classList.remove('active'); currentProfileStudent=null; }
 
 function switchProfileTab(tab) {
-  var tabs = ['attendance','sessions','promotions','notes','messages','financial'];
+  var tabs = ['attendance','sessions','promotions','notes','messages'];
   tabs.forEach(function(t){
     var cap = t.charAt(0).toUpperCase()+t.slice(1);
     var panel = document.getElementById('profileTab'+cap);
@@ -8847,86 +8860,183 @@ async function loadProfilePaymentHistory(sid){
 }
 
 // §BILLING-TAB — all memberships (past/present/future) + upcoming (Stripe-accurate where linked) + paid.
-async function loadProfileBilling(sid){
-  await loadProfilePaymentHistory(sid);        // Paid History (existing)
-  await loadProfileAllMemberships(sid);        // Memberships & Plans (all statuses)
-  await loadProfileUpcomingPayments(sid);      // Upcoming Payments
+// §BILLS-PAYMENTS — collapsible bills & payments ledger + Make a Payment (its own profile section).
+// NMAO stores real payments (paid/failed/cancelled) + the membership schedule; there is no stored
+// future-bill ledger, so "upcoming" = the real next charge only (Stripe-accurate where linked).
+var _billsCtx = { sid:null, familyIds:[], nameById:{}, pastDueCents:0, upcomingCents:0, loaded:false };
+
+// Light header summary loaded when the profile opens; the full list loads lazily on first expand.
+async function loadBillsSummary(sid){
+  _billsCtx = { sid:sid, familyIds:[sid], nameById:{}, pastDueCents:0, upcomingCents:0, loaded:false };
+  var body=document.getElementById('billsSectionBody'); if(body) body.style.display='none';
+  var caret=document.getElementById('billsCaret'); if(caret) caret.style.transform='';
+  var mp=document.getElementById('makePaymentPanel'); if(mp) mp.style.display='none';
+  var sumEl=document.getElementById('billsSummary'); if(sumEl) sumEl.innerHTML='';
+  try{
+    var pd=await sb.from('payments').select('amount,status,created_at').eq('student_id',sid).eq('school_id',SID).order('created_at',{ascending:false}).limit(60);
+    var rows=pd.data||[]; var lastPaid=rows.find(function(r){return r.status==='paid';});
+    var failedCents=0; rows.forEach(function(r){ if(r.status==='failed') failedCents+=Math.round((r.amount||0)*100); });
+    _billsCtx.pastDueCents=failedCents;
+    if(sumEl){ var bits=[];
+      if(failedCents>0) bits.push('<span style="color:#E07070">Past due $'+(failedCents/100).toFixed(2)+'</span>');
+      if(lastPaid) bits.push('Last payment '+smDateLabel((lastPaid.created_at||'').substring(0,10)));
+      sumEl.innerHTML=bits.join(' · '); }
+  }catch(e){}
 }
 
-async function loadProfileAllMemberships(sid){
-  var el=document.getElementById('billingMembershipsList'); if(!el) return;
+function toggleBillsSection(){
+  var body=document.getElementById('billsSectionBody'); var caret=document.getElementById('billsCaret');
+  if(!body) return;
+  var open = body.style.display==='none';
+  body.style.display = open?'block':'none';
+  if(caret) caret.style.transform = open?'rotate(180deg)':'';
+  if(open && !_billsCtx.loaded) loadBillsSection(_billsCtx.sid);
+}
+
+async function loadBillsSection(sid){
+  _billsCtx.loaded=true;
+  var ids=[sid], nameById={};
   try{
-    var r=await sb.from('student_memberships')
-      .select('*, memberships(name,billing_type,price,billing_length,billing_unit,class_limit_type,class_limit_count)')
-      .eq('student_id',sid).eq('school_id',SID).order('created_at',{ascending:false});
-    var data=r.data||[];
-    if(!data.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">No memberships on record.</div>'; return; }
-    var today=localDateStr(new Date());
-    function bucket(sm){
-      if(sm.start_date && sm.start_date>today) return 'future';
-      if(['active','trialing','paused','past_due'].indexOf(sm.status)!==-1) return 'current';
-      return 'past';
+    var me=await sb.from('students').select('id,first_name,last_name,family_id').eq('id',sid).single();
+    if(me.data) nameById[sid]=(me.data.first_name+' '+me.data.last_name).trim();
+    if(me.data && me.data.family_id){
+      var fam=await sb.from('students').select('id,first_name,last_name').eq('school_id',SID).eq('family_id',me.data.family_id);
+      (fam.data||[]).forEach(function(s){ if(ids.indexOf(s.id)===-1) ids.push(s.id); nameById[s.id]=(s.first_name+' '+s.last_name).trim(); });
     }
-    var groups={current:[],future:[],past:[]};
-    data.forEach(function(sm){ groups[bucket(sm)].push(sm); });
-    var html='';
-    [['current','Current'],['future','Upcoming'],['past','Past']].forEach(function(g){
-      var arr=groups[g[0]]; if(!arr.length) return;
-      html+='<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0.35rem 0 0.1rem">'+g[1]+'</div>';
-      html+=arr.map(renderBillingMembershipRow).join('');
-    });
-    el.innerHTML=html;
-  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Membership data unavailable.</div>'; }
+  }catch(e){}
+  _billsCtx.familyIds=ids; _billsCtx.nameById=nameById;
+  var isFamily=ids.length>1;
+  await renderBillsUpcoming(ids, nameById, isFamily);
+  await renderBillsList(ids, nameById, isFamily);
 }
 
-function renderBillingMembershipRow(sm){
-  var m=sm.memberships; var name=m?m.name:'--';
-  var price=m?smPriceLabel(m):'--';
-  var cl=m?smClassLine(m):'';
-  var bm=sm.billing_method||(sm.autopay?'autopay':'');
-  var bmLabel={autopay:'Autopay',external:'External',cash:'Cash',comp:'Comp'}[bm]||'';
-  var packLine=sm.is_class_pack?('<div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem">'+(sm.classes_remaining!=null?sm.classes_remaining:'?')+' classes remaining</div>'):'';
-  return '<div onclick="openMembershipDetail(\''+sm.id+'\')" style="cursor:pointer;background:var(--black);border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.85rem">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem"><div style="font-size:0.9rem;color:var(--white);font-weight:600">'+name+'</div>'+smStatusPill(sm.status)+'</div>'+
-    '<div style="font-size:0.78rem;color:var(--gold);margin-top:0.15rem">'+price+(cl?(' · '+cl):'')+(bmLabel?(' · '+bmLabel):'')+'</div>'+
-    smTermLine(sm)+packLine+
-    '<div style="font-size:0.66rem;color:var(--muted);margin-top:0.3rem"><i class="fa-solid fa-circle-info" style="margin-right:0.3rem"></i>View details</div>'+
-  '</div>';
+function billStatusBadge(s){
+  var map={paid:['PAID','#5A9A6A'],failed:['ERR','#E07070'],cancelled:['VOID','#888888'],pending:['PENDING','#C9A84C'],refunded:['REFUND','#7DAAD4']};
+  var v=map[s]||[(''+(s||'—')).toUpperCase(),'#888888'];
+  return '<span style="display:inline-block;font-size:0.6rem;font-weight:700;letter-spacing:0.04em;color:'+v[1]+';border:1px solid '+v[1]+'66;border-radius:999px;padding:0.12rem 0.5rem">'+v[0]+'</span>';
 }
 
-async function loadProfileUpcomingPayments(sid){
-  var el=document.getElementById('billingUpcomingList'); if(!el) return;
-  el.innerHTML='<div style="color:var(--muted);font-size:0.8rem"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Checking upcoming charges…</div>';
+async function renderBillsList(ids, nameById, isFamily){
+  var el=document.getElementById('billsList'); if(!el) return;
+  el.innerHTML='<div style="color:var(--muted);font-size:0.82rem"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Loading bills…</div>';
   try{
-    var r=await sb.from('student_memberships')
-      .select('id,status,price,autopay,billing_method,stripe_subscription_id,cycle_end_date,first_charge_date,start_date,is_class_pack, memberships(name,billing_type,class_limit_type)')
-      .eq('student_id',sid).eq('school_id',SID).in('status',['active','trialing','past_due']);
+    var r=await sb.from('payments').select('id,student_id,type,description,amount,status,due_date,created_at,invoice_number').in('student_id',ids).eq('school_id',SID).order('created_at',{ascending:false}).limit(200);
+    var data=r.data||[];
+    if(!data.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem;padding:1rem 0">No bills on record.</div>'; return; }
+    var typeLabels={membership:'Membership',retail_sale:'Retail',session:'Session',session_pack:'Session Pack',belt_test:'Belt Test',fee:'Fee',other:'Other'};
+    var cols=(isFamily?'1.2fr ':'')+'2fr 0.9fr 0.8fr 0.7fr';
+    var head='<div style="display:grid;grid-template-columns:'+cols+';gap:0.5rem;padding:0.4rem 0.5rem;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">'+(isFamily?'<div>Person</div>':'')+'<div>Description</div><div>Due</div><div style="text-align:right">Total</div><div style="text-align:center">Status</div></div>';
+    el.innerHTML='<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.4rem">Bills</div>'+head+data.map(function(p){
+      var d=(''+(p.due_date||p.created_at||'')).substring(0,10);
+      var person=isFamily?('<div style="font-size:0.78rem;color:var(--white)">'+(nameById[p.student_id]||'—')+'</div>'):'';
+      var desc=(typeLabels[p.type]||p.type||'Bill')+(p.description?('<span style="color:var(--muted);font-size:0.7rem"> · '+p.description+'</span>'):'');
+      return '<div style="display:grid;grid-template-columns:'+cols+';gap:0.5rem;padding:0.55rem 0.5rem;align-items:center;border-bottom:1px solid var(--border)">'+person+
+        '<div style="font-size:0.8rem;color:var(--white)">'+desc+'</div>'+
+        '<div style="font-size:0.74rem;color:var(--muted)">'+(d?smDateLabel(d):'—')+'</div>'+
+        '<div style="font-size:0.82rem;color:var(--gold);text-align:right">$'+parseFloat(p.amount||0).toFixed(2)+'</div>'+
+        '<div style="text-align:center">'+billStatusBadge(p.status)+'</div></div>';
+    }).join('');
+  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Bills unavailable.</div>'; }
+}
+
+async function renderBillsUpcoming(ids, nameById, isFamily){
+  var el=document.getElementById('billsUpcomingWrap'); if(!el) return;
+  _billsCtx.upcomingCents=0;
+  el.innerHTML='<div style="color:var(--muted);font-size:0.8rem"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Checking upcoming…</div>';
+  try{
+    var r=await sb.from('student_memberships').select('id,student_id,status,price,autopay,billing_method,stripe_subscription_id,cycle_end_date,first_charge_date,start_date,is_class_pack, memberships(name,billing_type,class_limit_type)').in('student_id',ids).eq('school_id',SID).in('status',['active','trialing','past_due']);
     var mems=(r.data||[]).filter(function(sm){ return !sm.is_class_pack && sm.memberships && sm.memberships.class_limit_type!=='class_pack' && INTERVAL_MAP[sm.memberships.billing_type]; });
-    if(!mems.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">No recurring plans — nothing scheduled.</div>'; return; }
-    // Stripe-accurate upcoming for any linked subscriptions (falls back to a scheduled estimate below).
+    if(!mems.length){ el.innerHTML=''; return; }
     var stripeMap={};
-    if(mems.some(function(sm){return sm.stripe_subscription_id;})){
+    var linkedStuds=[]; mems.forEach(function(m){ if(m.stripe_subscription_id && linkedStuds.indexOf(m.student_id)===-1) linkedStuds.push(m.student_id); });
+    for(var i=0;i<linkedStuds.length;i++){
       try{
-        var resp=await fetch(SURL+'/functions/v1/get-upcoming-invoices',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({school_id:SID,student_id:sid})});
+        var resp=await fetch(SURL+'/functions/v1/get-upcoming-invoices',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({school_id:SID,student_id:linkedStuds[i]})});
         var jd=await resp.json();
         (jd.upcoming||[]).forEach(function(u){ if(u&&u.membership_id&&!u.error&&u.amount_cents!=null) stripeMap[u.membership_id]=u; });
       }catch(e){}
     }
-    el.innerHTML=mems.map(function(sm){
-      var m=sm.memberships; var su=stripeMap[sm.id]; var amountStr,dateStr,tag;
-      if(su){
-        amountStr='$'+(su.amount_cents/100).toFixed(2);
-        dateStr=su.next_date?smDateLabel((''+su.next_date).substring(0,10)):'—';
-        tag='<span style="font-size:0.58rem;color:#7DAAD4;border:1px solid #7DAAD466;border-radius:999px;padding:0.08rem 0.42rem;margin-left:0.4rem">via Stripe</span>';
-      } else {
-        var d=sm.cycle_end_date||sm.first_charge_date||sm.start_date;
-        amountStr=sm.price!=null?('$'+parseFloat(sm.price).toFixed(2)):'—';
-        dateStr=d?smDateLabel(d):'—';
-        tag='<span style="font-size:0.58rem;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:0.08rem 0.42rem;margin-left:0.4rem">scheduled</span>';
-      }
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border)"><div><div style="font-size:0.85rem;color:var(--white)">'+(m?m.name:'Membership')+tag+'</div><div style="font-size:0.72rem;color:var(--muted)">Next charge · '+dateStr+'</div></div><div style="font-size:0.88rem;color:var(--gold)">'+amountStr+'</div></div>';
+    var totalCents=0;
+    var rowsHtml=mems.map(function(sm){
+      var m=sm.memberships; var su=stripeMap[sm.id]; var amt,dstr,tag;
+      if(su){ amt=su.amount_cents/100; dstr=su.next_date?smDateLabel((''+su.next_date).substring(0,10)):'—'; tag='via Stripe'; }
+      else { var d=sm.cycle_end_date||sm.first_charge_date||sm.start_date; amt=sm.price!=null?parseFloat(sm.price):null; dstr=d?smDateLabel(d):'—'; tag='scheduled'; }
+      if(amt!=null) totalCents+=Math.round(amt*100);
+      var ap=(sm.billing_method==='autopay'||sm.autopay===true);
+      var apBadge='<span style="font-size:0.56rem;font-weight:700;color:'+(ap?'#5A9A6A':'#888888')+';border:1px solid '+(ap?'#5A9A6A':'#888888')+'66;border-radius:999px;padding:0.08rem 0.42rem">'+(ap?'ON':'OFF')+'</span>';
+      var person=isFamily?('<span style="color:var(--white)">'+(nameById[sm.student_id]||'')+' · </span>'):'';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.5rem;border-bottom:1px solid var(--border)"><div><div style="font-size:0.82rem;color:var(--white)">'+person+(m?m.name:'Membership')+' <span style="font-size:0.56rem;color:#7DAAD4;border:1px solid #7DAAD466;border-radius:999px;padding:0.06rem 0.38rem;margin-left:0.3rem">'+tag+'</span></div><div style="font-size:0.7rem;color:var(--muted)">Next charge · '+dstr+' · Autopay '+apBadge+'</div></div><div style="font-size:0.85rem;color:var(--gold)">'+(amt!=null?('$'+amt.toFixed(2)):'—')+'</div></div>';
     }).join('');
-  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Upcoming payments unavailable.</div>'; }
+    _billsCtx.upcomingCents=totalCents;
+    el.innerHTML='<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.4rem">Upcoming</div>'+rowsHtml;
+  }catch(e){ el.innerHTML=''; }
+}
+
+// ── Make a Payment (Zen-Planner-style panel) ─────────────────────────────────
+// Card path reuses create-pos-charge (arbitrary custom line item, cents) → charges the card on file.
+// Offline path records a paid payments row directly. Charges the CURRENT profile student.
+var _mp = { currentCents:0, allCents:0 };
+function openMakePaymentPanel(){
+  var p=document.getElementById('makePaymentPanel'); if(!p) return;
+  var due=_billsCtx.pastDueCents||0, up=_billsCtx.upcomingCents||0;
+  _mp.currentCents=due; _mp.allCents=due+up;
+  document.getElementById('mpCurrentAmt').textContent='$'+(due/100).toFixed(2);
+  document.getElementById('mpAllAmt').textContent='$'+((due+up)/100).toFixed(2);
+  var cardEl=document.getElementById('profileCardOnFile');
+  var cardLabel=document.getElementById('mpCardLabel');
+  if(cardLabel) cardLabel.textContent = (cardEl && /\d{4}/.test(cardEl.textContent||'')) ? ('Card on file — '+cardEl.textContent.trim()) : 'Card on file';
+  var cur=document.querySelector('input[name=mpAmt][value=current]'); if(cur) cur.checked=true;
+  var oi=document.getElementById('mpOtherInput'); if(oi) oi.value='';
+  document.getElementById('mpMsg').textContent='';
+  mpAmtChange();
+  p.style.display='block';
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeMakePaymentPanel(){ var p=document.getElementById('makePaymentPanel'); if(p) p.style.display='none'; }
+function mpSelectedCents(){
+  var v=(document.querySelector('input[name=mpAmt]:checked')||{}).value;
+  if(v==='current') return _mp.currentCents;
+  if(v==='all') return _mp.allCents;
+  var o=parseFloat(document.getElementById('mpOtherInput').value); return (isFinite(o)&&o>0)?Math.round(o*100):0;
+}
+function mpAmtChange(){ var c=mpSelectedCents(); var el=document.getElementById('mpSubmitAmt'); if(el) el.textContent='$'+(c/100).toFixed(2); }
+async function submitMakePayment(){
+  var cents=mpSelectedCents(); var msg=document.getElementById('mpMsg');
+  if(!cents||cents<=0){ msg.textContent='Enter an amount greater than $0.'; msg.className='form-msg error'; return; }
+  var method=(document.querySelector('input[name=mpMethod]:checked')||{}).value;
+  var btn=document.getElementById('mpSubmitBtn'); var orig=btn.innerHTML; btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Processing…';
+  msg.textContent=''; msg.className='form-msg';
+  try{
+    if(method==='offline'){
+      var mtype=document.getElementById('mpOfflineType').value;
+      var nowIso=new Date().toISOString();
+      var ins=await sb.from('payments').insert({ school_id:SID, student_id:_billsCtx.sid, amount:cents/100, type:'membership', status:'paid', description:'Offline payment — '+mtype, created_at:nowIso, paid_at:nowIso });
+      if(ins.error) throw new Error(ins.error.message);
+      msg.textContent='Recorded $'+(cents/100).toFixed(2)+' ('+mtype+').'; msg.className='form-msg success';
+    } else {
+      var uid=null; try{ var s=await sb.auth.getUser(); uid=(s&&s.data&&s.data.user)?s.data.user.id:null; }catch(e){}
+      var idem=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('mp_'+Date.now()+'_'+Math.round(Math.random()*1e6));
+      var resp=await fetch(SURL+'/functions/v1/create-pos-charge',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({ school_id:SID, student_id:_billsCtx.sid, line_items:[{name:'Bill payment', unit_amount:cents, quantity:1, product_id:null, item_type:'custom'}], credit_to_apply_cents:0, applied_by:uid, idempotency_key:idem })});
+      var jd={}; try{ jd=await resp.json(); }catch(e){}
+      if(!resp.ok || jd.error){
+        var em=jd.error||'Charge failed';
+        if(em.indexOf('NO_SAVED_CARD')>-1) em='No saved card on file — add a card first.';
+        else if(em.indexOf('AUTHENTICATION_REQUIRED')>-1) em='This card needs 3-D Secure authentication; send a payment link instead.';
+        else em=em.replace(/^[A-Z_]+:\s*/,'');
+        throw new Error(em);
+      }
+      msg.textContent='Charged $'+(((jd.gross_charged_cents!=null?jd.gross_charged_cents:cents))/100).toFixed(2)+(jd.last4?(' to card ····'+jd.last4):'')+'.'; msg.className='form-msg success';
+    }
+    _billsCtx.loaded=false;
+    await loadBillsSummary(_billsCtx.sid);
+    var body=document.getElementById('billsSectionBody'); if(body) body.style.display='block';
+    var caret=document.getElementById('billsCaret'); if(caret) caret.style.transform='rotate(180deg)';
+    await loadBillsSection(_billsCtx.sid);
+    if(window.showToast) showToast('Payment recorded.','ok');
+    setTimeout(closeMakePaymentPanel, 1800);
+  }catch(e){ msg.textContent=(e&&e.message)||'Payment failed.'; msg.className='form-msg error'; }
+  btn.disabled=false; btn.innerHTML=orig;
 }
 
 function toggleManualPaymentForm(){
