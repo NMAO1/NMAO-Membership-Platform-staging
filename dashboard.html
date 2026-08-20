@@ -2179,8 +2179,7 @@
           </div>
 
           <div style="border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem">
-            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-credit-card" style="color:var(--gold)"></i>Billing <button class="help-hint-inline" onclick="openHelpPopover('profile.sec_billing',this)" title="Help">?</button></div><div style="font-size:0.68rem;color:var(--muted);font-weight:normal;text-transform:none;letter-spacing:0;margin:-0.5rem 0 0.85rem">The money — these set how and what the plan charges.</div>
-            <div style="font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem">Card on File</div>
+            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-credit-card" style="color:var(--gold)"></i>Card On File <button class="help-hint-inline" onclick="openHelpPopover('profile.sec_billing',this)" title="Help">?</button></div><div style="font-size:0.68rem;color:var(--muted);font-weight:normal;text-transform:none;letter-spacing:0;margin:-0.5rem 0 0.85rem">The saved card and billing day for this member.</div>
             <div id="profileCardOnFile" style="font-size:0.82rem;color:var(--muted);font-style:italic">Loading...</div>
             <div style="border-top:1px solid var(--border);margin:0.9rem 0"></div>
             <div style="font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem">Billing Day Override</div>
@@ -5094,7 +5093,7 @@ var HELP_CONTENT = {
 'profile.sec_tags': { title: 'Tags', purpose: 'Labels for segmenting this member in reports and broadcasts. Add a tag to apply it immediately.' },
 'profile.sec_progress': { title: 'Progress', purpose: 'Belt rank and progress toward the next test, plus the class tracker showing attendance against their plan allowance.' },
 'profile.sec_memberships': { title: 'Memberships', purpose: 'Active plans and packs for this member, plus admin actions under More actions: switch or comp a plan, issue account credit, or cancel.' },
-'profile.sec_billing': { title: 'Billing', purpose: 'The card Stripe will charge and an optional billing-day override for this member only. Leave the override on Use Membership Default to follow the plan.' },
+'profile.sec_billing': { title: 'Card On File', purpose: 'The card Stripe will charge and an optional billing-day override for this member only. Leave the override on Use Membership Default to follow the plan.' },
 
 'payments.discounts': { title: 'Discounts applied', purpose: 'Every staff discount from the last 90 days: how many sales, the total given away, and how many repeat every cycle. Each row in the ledger shows the amount, whether it is one-time or recurring, who applied it, and the reason.' },
 'custom.cc_startdate': { title: 'Start date', purpose: 'The member-since date this membership began. Backdate for a migrated member; blank = today. Record-only, does not affect billing.' },
