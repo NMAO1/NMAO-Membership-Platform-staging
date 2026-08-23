@@ -5111,7 +5111,8 @@ var HELP_CONTENT = {
 'profile.sec_tags': { title: 'Tags', purpose: 'Labels for segmenting this member in reports and broadcasts. Add a tag to apply it immediately.' },
 'profile.sec_progress': { title: 'Progress', purpose: 'Belt rank and progress toward the next test, plus the class tracker showing attendance against their plan allowance.' },
 'profile.sec_memberships': { title: 'Memberships', purpose: 'Active plans and packs for this member, plus admin actions under More actions: switch or comp a plan, issue account credit, or cancel.' },
-'profile.sec_billing': { title: 'Card On File', purpose: 'The card Stripe will charge and an optional billing-day override for this member only. Leave the override on Use Membership Default to follow the plan.' },
+'profile.sec_billing': { title: 'Card On File', purpose: 'The saved card Stripe charges for this member. Use Add Card to save one, or Send Link to have the member add it themselves.' },
+'profile.billing_method': { title: 'Billing method', purpose: 'How this member is classified for billing. Important: the Autopay button must show green for autopay to be enabled — choosing Autopay here does not start billing on its own (autopay needs a card on file and is switched on with the green toggle). Cash, Comp, and External are manual labels for members you bill outside Stripe.' },
 'profile.autopay': { title: 'Autopay', purpose: 'The one switch that turns automatic billing on or off for this plan. ON (green) means a live Stripe subscription is charging the card on file on schedule. OFF (red) pauses it — the subscription is kept and can be resumed anytime; to fully end the plan use Cancel Plan under More actions. You can only turn autopay ON when a card is on file. Example: flip a new member to ON and their $150/mo starts billing automatically; flip a member leaving for the summer to OFF and no charges run until you flip it back.' },
 'profile.autopay_mode': { title: 'Billing start', purpose: 'How the FIRST charge behaves when you turn autopay on. Prepay today: charge one full month now, next charge is the following cycle (e.g. pay $199 today for September, next charge Oct 1). Prorate: charge only the partial days until the start date now, full amount on the date (e.g. ~$78 today for Aug 20-Sep 1, then $199 on Sep 1). Nothing today: $0 now, the first full charge lands on the start date (e.g. $0 today, $199 on Sep 1). All three then recur every month on the start date’s day.' },
 'profile.signup_fee': { title: 'Signup fee', purpose: 'A one-time enrollment fee set on the plan, charged to the card on file today when you turn autopay on — separate from the recurring dues. Example: a $100 signup fee is charged now, and the $199/mo membership begins on the start date. Uncheck it to skip or waive the fee for this member.' },
@@ -10513,7 +10514,7 @@ function mdRender(sm,m,progNames,classNames,pays){
   var _bmSel = '<select onchange="mdSetBillingMethod(this.value)" style="background:#141414;color:var(--white);border:1px solid var(--border);border-radius:6px;padding:0.25rem 0.4rem;font-size:0.78rem">'
     + _bmOpt('','— Unclassified') + _bmOpt('autopay','Autopay (Stripe)') + _bmOpt('cash','Cash / check')
     + _bmOpt('comp','Comp / free') + _bmOpt('external','External / prepaid') + '</select>';
-  h+='<div style="display:flex;justify-content:space-between;gap:1rem;padding:0.3rem 0;font-size:0.82rem;align-items:center"><span style="color:var(--muted)">Billing method</span><span style="display:flex;align-items:center;gap:0.4rem">'+_bmSel+'<span id="mdBmMsg" style="font-size:0.7rem;color:var(--muted)"></span></span></div>';
+  h+='<div style="display:flex;justify-content:space-between;gap:1rem;padding:0.3rem 0;font-size:0.82rem;align-items:center"><span style="color:var(--muted)">Billing method <button class="help-hint-inline" onclick="openHelpPopover(\'profile.billing_method\',this)" title="Help">?</button></span><span style="display:flex;align-items:center;gap:0.4rem">'+_bmSel+'<span id="mdBmMsg" style="font-size:0.7rem;color:var(--muted)"></span></span></div>';
   h+=row('Billing mode', billed);
   h+=row('Member since', since);
   h+=row('Next charge', next);
@@ -10534,7 +10535,16 @@ function mdRender(sm,m,progNames,classNames,pays){
 async function mdSetBillingMethod(val){
   if(!_mdRow || !_mdRow.id) return;
   var v = val || null;
-  var msgEl=document.getElementById('mdBmMsg'); if(msgEl){ msgEl.textContent='Saving…'; msgEl.style.color='var(--muted)'; }
+  var msgEl=document.getElementById('mdBmMsg');
+  // Autopay is enabled ONLY by the green Autopay toggle (card-gated, creates the Stripe sub).
+  // Writing 'autopay' here on a membership with no live sub would just LOOK on + trip the daily
+  // billing alert — so block it and point staff at the toggle.
+  if(v==='autopay' && !_mdRow.stripe_subscription_id){
+    if(msgEl){ msgEl.textContent='Autopay button must show green for autopay to be enabled.'; msgEl.style.color='#E2A84C'; }
+    var _sel=document.querySelector('select[onchange^="mdSetBillingMethod"]'); if(_sel) _sel.value=_mdRow.billing_method||'';
+    return;
+  }
+  if(msgEl){ msgEl.textContent='Saving…'; msgEl.style.color='var(--muted)'; }
   try{
     var r = await sb.from('student_memberships').update({billing_method:v}).eq('id',_mdRow.id);
     if(r.error) throw r.error;
