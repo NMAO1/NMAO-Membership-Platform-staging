@@ -2213,6 +2213,7 @@
           <button class="profile-tab" id="tab-promotions"  onclick="switchProfileTab('promotions')">Belt History</button>
           <button class="profile-tab" id="tab-notes"       onclick="switchProfileTab('notes')">Notes</button>
           <button class="profile-tab" id="tab-messages"    onclick="switchProfileTab('messages')">Messages</button>
+          <button class="profile-tab" id="tab-financial"   onclick="switchProfileTab('financial')">Financial</button>
         </div>
         <div id="profileTabAttendance"><div id="profileAttendanceList" style="display:flex;flex-direction:column;gap:0.5rem"></div></div>
         <div id="profileTabSessions" style="display:none">
@@ -2234,6 +2235,25 @@
           <button class="panel-action" style="margin-bottom:1rem" onclick="sendStudentMessage()"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
           <p class="form-msg" id="profileMsgStatus"></p>
           <div id="profileMsgHistory" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+        </div>
+        <!-- §FINANCIAL-TAB — consolidated money owed (membership past-due, testing, events, cancel fees) + pay one or all -->
+        <div id="profileTabFinancial" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem">
+            <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)">Money Owed <span id="finOwedTotal" style="color:var(--gold);text-transform:none;letter-spacing:0;margin-left:0.4rem"></span></div>
+            <button class="panel-action gold" id="finMakePaymentBtn" style="font-size:0.72rem;display:none" onclick="openFinPay()"><i class="fa-solid fa-cash-register" style="margin-right:0.35rem"></i>Make a Payment</button>
+          </div>
+          <div id="finOwedList" style="margin-bottom:1.5rem"></div>
+          <div id="finPayPanel" style="display:none;border:1px solid var(--gold);border-radius:8px;padding:1rem 1.1rem;background:var(--black);margin-bottom:1.5rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem"><div style="font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)">Make a Payment</div><button onclick="closeFinPay()" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fa-solid fa-xmark"></i></button></div>
+            <div style="font-size:0.64rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Bills to pay <span style="text-transform:none;letter-spacing:0">— uncheck any you're not collecting now</span></div>
+            <div id="finPaySelect" style="margin-bottom:0.85rem"></div>
+            <div style="font-size:0.64rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Payment Method</div>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;cursor:pointer"><input type="radio" name="finMethod" value="card" checked><span style="font-size:0.82rem;color:var(--white)">Card on file</span></label>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;flex-wrap:wrap"><input type="radio" name="finMethod" value="offline"><span style="font-size:0.82rem;color:var(--white)">Offline</span><select id="finOfflineType" style="background:var(--surface);border:1px solid var(--border);color:var(--white);padding:0.25rem 0.4rem;font-size:0.78rem;font-family:var(--font-ui)"><option value="cash">Cash</option><option value="check">Check</option><option value="other">Other</option></select></label>
+            <div style="margin-top:0.85rem"><button class="panel-action gold" id="finPayBtn" style="font-size:0.72rem" onclick="submitFinPay()"><i class="fa-solid fa-bolt" style="margin-right:0.4rem"></i>Pay <span id="finPayAmt"></span></button><p id="finPayMsg" class="form-msg" style="margin-top:0.4rem"></p></div>
+          </div>
+          <div style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem">Payment History</div>
+          <div id="finPaidList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
         </div>
       </div>
       <!-- §DSAR-DANGER-ZONE — permanent GDPR/CCPA erasure. Deliberately at the bottom, separated
@@ -8318,7 +8338,7 @@ async function openStudentProfile(sid) {
 function closeStudentProfile() { document.getElementById('studentProfileModal').classList.remove('active'); currentProfileStudent=null; }
 
 function switchProfileTab(tab) {
-  var tabs = ['attendance','sessions','promotions','notes','messages'];
+  var tabs = ['attendance','sessions','promotions','notes','messages','financial'];
   tabs.forEach(function(t){
     var cap = t.charAt(0).toUpperCase()+t.slice(1);
     var panel = document.getElementById('profileTab'+cap);
@@ -8326,6 +8346,149 @@ function switchProfileTab(tab) {
     var btn = document.getElementById('tab-'+t);
     if (btn) btn.classList.toggle('active', t===tab);
   });
+  if (tab==='financial' && typeof currentProfileStudent!=='undefined' && currentProfileStudent) loadFinancialTab(currentProfileStudent.id);
+}
+
+// §FINANCIAL-TAB (Option B) — one place for every dollar a member (and family) owes, across
+// membership past-due, belt-test fees, events, and cancel fees. Read-and-aggregate only; every
+// settle action routes to the SAME engines already used elsewhere (create-pos-charge / source flag).
+var _finCtx = { sid:null, ids:[], nameById:{}, isFamily:false, owed:[] };
+var FIN_TYPE = { belt_test:['Testing','#A32BF7'], event:['Event','#1F7BFF'], cancel_fee:['Cancel fee','#E07070'], past_due:['Past due','#E07070'] };
+
+async function loadOwedItems(ids){
+  var items=[];
+  try{ var bt=await sb.from('belt_test_students').select('id,student_id,fee_amount,belt_tests(name)').in('student_id',ids).eq('school_id',SID).eq('fee_paid',false).gt('fee_amount',0);
+    (bt.data||[]).forEach(function(r){ items.push({type:'belt_test',ref:r.id,student_id:r.student_id,label:'Belt test fee'+(r.belt_tests&&r.belt_tests.name?(' — '+r.belt_tests.name):''),cents:Math.round((r.fee_amount||0)*100)}); }); }catch(e){}
+  try{ var ev=await sb.from('event_registrations').select('id,student_id,amount,events(name)').in('student_id',ids).eq('school_id',SID).eq('paid',false).gt('amount',0);
+    (ev.data||[]).forEach(function(r){ items.push({type:'event',ref:r.id,student_id:r.student_id,label:'Event'+(r.events&&r.events.name?(': '+r.events.name):''),cents:Math.round((r.amount||0)*100)}); }); }catch(e){}
+  try{ var cf=await sb.from('student_memberships').select('id,student_id,early_cancel_fee_owed,memberships(name)').in('student_id',ids).eq('school_id',SID).gt('early_cancel_fee_owed',0).is('early_cancel_fee_collected_at',null);
+    (cf.data||[]).forEach(function(r){ items.push({type:'cancel_fee',ref:r.id,student_id:r.student_id,label:'Early-cancel fee'+(r.memberships&&r.memberships.name?(' — '+r.memberships.name):''),cents:Math.round((r.early_cancel_fee_owed||0)*100)}); }); }catch(e){}
+  try{ var pd=await sb.from('payments').select('id,student_id,type,description,amount').in('student_id',ids).eq('school_id',SID).eq('status','failed');
+    (pd.data||[]).forEach(function(r){ items.push({type:'past_due',ref:r.id,student_id:r.student_id,label:(r.description||r.type||'Payment')+' (past due)',cents:Math.round((r.amount||0)*100)}); }); }catch(e){}
+  return items;
+}
+
+async function loadFinancialTab(sid){
+  var listEl=document.getElementById('finOwedList'); if(!listEl) return;
+  listEl.innerHTML='<div style="color:var(--muted);font-size:0.82rem"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Loading…</div>';
+  var pp=document.getElementById('finPayPanel'); if(pp) pp.style.display='none';
+  var ids=[sid], nameById={};
+  try{
+    var me=await sb.from('students').select('id,first_name,last_name,family_id').eq('id',sid).single();
+    if(me.data) nameById[sid]=(me.data.first_name+' '+me.data.last_name).trim();
+    if(me.data&&me.data.family_id){ var fam=await sb.from('students').select('id,first_name,last_name').eq('school_id',SID).eq('family_id',me.data.family_id); (fam.data||[]).forEach(function(s){ if(ids.indexOf(s.id)===-1) ids.push(s.id); nameById[s.id]=(s.first_name+' '+s.last_name).trim(); }); }
+  }catch(e){}
+  var isFamily=ids.length>1;
+  var owed=await loadOwedItems(ids);
+  _finCtx={sid:sid,ids:ids,nameById:nameById,isFamily:isFamily,owed:owed};
+  var totalEl=document.getElementById('finOwedTotal');
+  var payBtn=document.getElementById('finMakePaymentBtn');
+  if(!owed.length){
+    listEl.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem;padding:0.5rem 0">Nothing owed — all settled.</div>';
+    if(totalEl) totalEl.textContent='';
+    if(payBtn) payBtn.style.display='none';
+  } else {
+    var totalCents=owed.reduce(function(a,x){return a+x.cents;},0);
+    if(totalEl) totalEl.textContent='$'+(totalCents/100).toFixed(2)+' · '+owed.length+' bill'+(owed.length!==1?'s':'');
+    if(payBtn) payBtn.style.display='';
+    listEl.innerHTML=owed.map(function(it){
+      var b=FIN_TYPE[it.type]||[it.type,'#888888'];
+      var person=isFamily?('<span style="color:var(--white);font-size:0.8rem">'+(nameById[it.student_id]||'')+' · </span>'):'';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;padding:0.6rem 0.5rem;border-bottom:1px solid var(--border)">'+
+        '<div style="font-size:0.84rem;color:var(--white)">'+person+it.label+' <span style="font-size:0.56rem;color:'+b[1]+';border:1px solid '+b[1]+'66;border-radius:999px;padding:0.08rem 0.42rem;margin-left:0.3rem">'+b[0]+'</span></div>'+
+        '<div style="display:flex;align-items:center;gap:0.7rem;flex-shrink:0"><span style="font-size:0.88rem;color:var(--gold)">$'+(it.cents/100).toFixed(2)+'</span><button class="btn-sm" style="font-size:0.6rem;padding:0.15rem 0.45rem" onclick="finWaiveOne(\''+it.type+'\',\''+it.ref+'\')">Comp</button></div>'+
+      '</div>';
+    }).join('');
+  }
+  loadFinPaidHistory(ids, nameById, isFamily);
+}
+
+async function loadFinPaidHistory(ids, nameById, isFamily){
+  var el=document.getElementById('finPaidList'); if(!el) return;
+  try{
+    var r=await sb.from('payments').select('id,student_id,type,description,amount,created_at,status').in('student_id',ids).eq('school_id',SID).eq('status','paid').order('created_at',{ascending:false}).limit(30);
+    var data=r.data||[];
+    if(!data.length){ el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.82rem">No payments yet.</div>'; return; }
+    var lbl={membership:'Membership',retail_sale:'Retail',session:'Session',session_pack:'Session Pack',belt_test:'Belt Test',fee:'Fee',other:'Other'};
+    el.innerHTML=data.map(function(p){
+      var d=(''+(p.created_at||'')).substring(0,10);
+      var person=isFamily?('<span style="color:var(--white)">'+(nameById[p.student_id]||'')+' · </span>'):'';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.5rem;border-bottom:1px solid var(--border)"><div style="font-size:0.82rem;color:var(--muted)">'+person+(lbl[p.type]||p.type||'Payment')+(p.description?(' · '+p.description):'')+' · '+(d?smDateLabel(d):'')+'</div><div style="font-size:0.84rem;color:#5A9A6A">$'+parseFloat(p.amount||0).toFixed(2)+'</div></div>';
+    }).join('');
+  }catch(e){ el.innerHTML='<div style="color:var(--muted);font-size:0.82rem">History unavailable.</div>'; }
+}
+
+// Mark one owed item settled in its source table (used by offline pay + after a card charge succeeds).
+async function markOwedSettled(type, ref){
+  var now=new Date().toISOString();
+  if(type==='belt_test') return sb.from('belt_test_students').update({fee_paid:true,paid_at:now}).eq('id',ref).eq('school_id',SID);
+  if(type==='event') return sb.from('event_registrations').update({paid:true,paid_at:now}).eq('id',ref).eq('school_id',SID);
+  if(type==='cancel_fee') return sb.from('student_memberships').update({early_cancel_fee_collected_at:now}).eq('id',ref).eq('school_id',SID);
+  if(type==='past_due') return sb.from('payments').update({status:'paid',paid_at:now}).eq('id',ref).eq('school_id',SID);
+}
+
+async function finWaiveOne(type, ref){
+  if(!confirm('Comp / waive this charge? It will be marked settled with no payment.')) return;
+  var now=new Date().toISOString();
+  try{
+    if(type==='belt_test') await sb.from('belt_test_students').update({fee_amount:0,fee_paid:true,paid_at:now}).eq('id',ref).eq('school_id',SID);
+    else if(type==='cancel_fee') await sb.from('student_memberships').update({early_cancel_fee_owed:0,early_cancel_fee_collected_at:now}).eq('id',ref).eq('school_id',SID);
+    else if(type==='event') await sb.from('event_registrations').update({paid:true,paid_at:now,amount:0}).eq('id',ref).eq('school_id',SID);
+    else if(type==='past_due') await sb.from('payments').update({status:'cancelled'}).eq('id',ref).eq('school_id',SID);
+    if(window.showToast) showToast('Comped.','ok');
+  }catch(e){ alert('Could not comp: '+(e&&e.message?e.message:e)); }
+  await loadFinancialTab(_finCtx.sid);
+}
+
+function openFinPay(){
+  var p=document.getElementById('finPayPanel'); if(!p) return;
+  var sel=document.getElementById('finPaySelect');
+  if(!_finCtx.owed.length){ if(window.showToast) showToast('Nothing owed.','ok'); return; }
+  sel.innerHTML=_finCtx.owed.map(function(it,i){
+    var person=_finCtx.isFamily?((_finCtx.nameById[it.student_id]||'')+' · '):'';
+    return '<label style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;cursor:pointer"><input type="checkbox" class="finPayChk" data-i="'+i+'" checked onchange="finPayRecalc()"><span style="flex:1;font-size:0.82rem;color:var(--white)">'+person+it.label+'</span><span style="font-size:0.82rem;color:var(--gold)">$'+(it.cents/100).toFixed(2)+'</span></label>';
+  }).join('');
+  document.getElementById('finPayMsg').textContent='';
+  finPayRecalc();
+  p.style.display='block';
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeFinPay(){ var p=document.getElementById('finPayPanel'); if(p) p.style.display='none'; }
+function finPaySelectedIdx(){ return Array.prototype.slice.call(document.querySelectorAll('.finPayChk')).filter(function(c){return c.checked;}).map(function(c){return parseInt(c.getAttribute('data-i'),10);}); }
+function finPayRecalc(){
+  var idx=finPaySelectedIdx(); var cents=idx.reduce(function(a,i){return a+(_finCtx.owed[i]?_finCtx.owed[i].cents:0);},0);
+  var el=document.getElementById('finPayAmt'); if(el) el.textContent='$'+(cents/100).toFixed(2);
+}
+async function submitFinPay(){
+  var idx=finPaySelectedIdx(); var msg=document.getElementById('finPayMsg');
+  if(!idx.length){ msg.textContent='Select at least one bill.'; msg.className='form-msg error'; return; }
+  var picks=idx.map(function(i){return _finCtx.owed[i];});
+  var method=(document.querySelector('input[name=finMethod]:checked')||{}).value;
+  var btn=document.getElementById('finPayBtn'); var orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-circle-notch fa-spin" style="margin-right:0.4rem"></i>Processing…';
+  msg.textContent=''; msg.className='form-msg';
+  try{
+    if(method==='card'){
+      // Card charges are per-student (each student's own/family card), so group the picks by student.
+      var byStu={}; picks.forEach(function(it){ (byStu[it.student_id]=byStu[it.student_id]||[]).push(it); });
+      var uid=null; try{ var s=await sb.auth.getUser(); uid=(s&&s.data&&s.data.user)?s.data.user.id:null; }catch(e){}
+      for(var stu in byStu){
+        var group=byStu[stu];
+        var line_items=group.map(function(it){ return {name:it.label,unit_amount:it.cents,quantity:1,product_id:null,item_type:'custom'}; });
+        var idem=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('fin_'+Date.now()+'_'+Math.round(Math.random()*1e6));
+        var resp=await fetch(SURL+'/functions/v1/create-pos-charge',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},body:JSON.stringify({school_id:SID,student_id:stu,line_items:line_items,credit_to_apply_cents:0,applied_by:uid,idempotency_key:idem})});
+        var jd={}; try{ jd=await resp.json(); }catch(e){}
+        if(!resp.ok||jd.error){ var em=(jd.error||'Charge failed').replace(/^[A-Z_]+:\s*/,''); throw new Error(em+((_finCtx.nameById[stu])?(' ('+_finCtx.nameById[stu]+')'):'')); }
+        for(var g=0;g<group.length;g++){ await markOwedSettled(group[g].type, group[g].ref); }
+      }
+      msg.textContent='Charged '+picks.length+' bill'+(picks.length!==1?'s':'')+'.'; msg.className='form-msg success';
+    } else {
+      for(var i=0;i<picks.length;i++){ await markOwedSettled(picks[i].type, picks[i].ref); }
+      msg.textContent='Marked '+picks.length+' bill'+(picks.length!==1?'s':'')+' paid (offline).'; msg.className='form-msg success';
+    }
+    if(window.showToast) showToast('Payment recorded.','ok');
+    setTimeout(function(){ closeFinPay(); loadFinancialTab(_finCtx.sid); }, 1200);
+  }catch(e){ msg.textContent=(e&&e.message)||'Payment failed.'; msg.className='form-msg error'; }
+  btn.disabled=false; btn.innerHTML=orig;
 }
 
 async function loadStudentCredit(sid){
