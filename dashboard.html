@@ -8888,10 +8888,12 @@ async function chargeForPlan(smid){
     try{ var cr=await sb.from('account_credits').select('amount_cents').eq('school_id',SID).eq('student_id',currentProfileStudent.id); (cr.data||[]).forEach(function(row){balanceCents+=(row.amount_cents||0);}); }catch(e){}
     if(balanceCents<0) balanceCents=0;
     var priceCents=Math.round((m.price||0)*100);
-    var isRecurring = !!INTERVAL_MAP[m.billing_type] && m.class_limit_type!=='class_pack';
-    _chargePlan={ name:(m.name||'Plan'), membershipId:planId, plan:m, isRecurring:isRecurring, priceCents:priceCents, balanceCents:balanceCents, passFees:passFees, applyCents:Math.min(balanceCents,priceCents), idemKey:'cp_'+Date.now()+'_'+Math.round(Math.random()*100000) };
-    document.getElementById('chargePlanName').textContent=_chargePlan.name+(isRecurring?(' (auto-renews '+smFreqWord(m)+')'):' (one-time)');
-    document.getElementById('chargePlanPrice').textContent=isRecurring?smPriceLabel(m):('$'+(priceCents/100).toFixed(2));
+    // §CHARGE-ONE-TIME (Option B) — "Charge for this plan" is ALWAYS a one-time charge of the plan price
+    // (one cycle for a recurring plan). Recurring billing is set up only via the Autopay toggle.
+    var isRecurringPlan = !!INTERVAL_MAP[m.billing_type] && m.class_limit_type!=='class_pack';
+    _chargePlan={ name:(m.name||'Plan'), membershipId:planId, plan:m, isRecurring:false, isRecurringPlan:isRecurringPlan, priceCents:priceCents, balanceCents:balanceCents, passFees:passFees, applyCents:Math.min(balanceCents,priceCents), idemKey:'cp_'+Date.now()+'_'+Math.round(Math.random()*100000) };
+    document.getElementById('chargePlanName').textContent=_chargePlan.name+' — one-time charge';
+    document.getElementById('chargePlanPrice').textContent='$'+(priceCents/100).toFixed(2);
     var crow=document.getElementById('chargePlanCreditRow');
     if(balanceCents>0){
       crow.style.display='flex';
@@ -8932,7 +8934,7 @@ function updateChargePlanBreakdown(){
     if(_chargePlan.passFees && cardBase>0){ grossCents=Math.round((cardBase+30)/(1-0.039)); feeCents=grossCents-cardBase; }
     totalCents=grossCents;
     if(lblEl) lblEl.textContent='Card will be charged';
-    if(noteEl) noteEl.style.display='none';
+    if(noteEl){ if(_chargePlan.isRecurringPlan){ noteEl.style.display='block'; noteEl.textContent='Charges one cycle now — for recurring billing, use the Autopay toggle.'; } else { noteEl.style.display='none'; } }
   }
   var feeRow=document.getElementById('chargePlanFeeRow');
   if(feeCents>0){ feeRow.style.display='flex'; document.getElementById('chargePlanFee').textContent='+$'+(feeCents/100).toFixed(2); }
@@ -8948,14 +8950,10 @@ async function confirmChargePlan(){
   try{
     var sess=await sb.auth.getSession();
     var uid=(sess&&sess.data&&sess.data.session)?sess.data.session.user.id:null;
-    var endpoint, payload;
-    if(_chargePlan.isRecurring){
-      endpoint='create-membership-subscription';
-      payload={ school_id:SID, student_id:currentProfileStudent.id, membership_id:_chargePlan.membershipId, credit_to_apply_cents:_chargePlan.applyCents, applied_by:uid, idempotency_key:_chargePlan.idemKey };
-    } else {
-      endpoint='create-pos-charge';
-      payload={ school_id:SID, student_id:currentProfileStudent.id, line_items:[{name:_chargePlan.name,unit_amount:_chargePlan.priceCents,quantity:1,product_id:null,item_type:'custom'}], credit_to_apply_cents:_chargePlan.applyCents, applied_by:uid, idempotency_key:_chargePlan.idemKey };
-    }
+    // §CHARGE-ONE-TIME — always a one-time charge; recurring subscriptions are created ONLY by the
+    // Autopay toggle (the single canonical path via ensure-subscription).
+    var endpoint='create-pos-charge';
+    var payload={ school_id:SID, student_id:currentProfileStudent.id, line_items:[{name:_chargePlan.name,unit_amount:_chargePlan.priceCents,quantity:1,product_id:null,item_type:'custom'}], credit_to_apply_cents:_chargePlan.applyCents, applied_by:uid, idempotency_key:_chargePlan.idemKey };
     var r=await fetch(SURL+'/functions/v1/'+endpoint,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},
