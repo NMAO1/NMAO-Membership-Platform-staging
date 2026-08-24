@@ -2673,7 +2673,7 @@
           <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.4rem"><i class="fa-solid fa-id-card" style="color:var(--gold)"></i>Enrollment <button class="help-hint-inline" onclick="openHelpPopover('students.sec_enrollment',this)" title="Help">?</button></div>
           <div class="field"><label>Program</label><select id="stuProgram" onchange="filterMembershipsForProgram()"><option value="">-- Select a Program --</option></select></div>
           <div class="field"><label>Membership Plan</label><select id="stuMembership"><option value="">-- Select a Program first --</option></select></div>
-          <div class="field"><label>Billing method</label><select id="stuBillingMethod"><option value="autopay">Autopay (card / Stripe)</option><option value="cash">Cash / check</option><option value="comp">Comp / free</option><option value="external">External / prepaid</option></select></div>
+          <div class="field"><label>Billing method</label><select id="stuBillingMethod"><option value="cash">Cash / check</option><option value="autopay">Autopay (activate with the toggle + a card)</option><option value="comp">Comp / free</option><option value="external">External / prepaid</option></select></div>
           <div class="form-row" style="margin-bottom:0"><div class="field" style="margin-bottom:0"><label>Start Date</label><input type="date" id="stuStartDate" /></div><div class="field" style="margin-bottom:0"><label>Status</label><select id="stuStatus"><option value="active">Active</option><option value="trial">Trial</option><option value="paused">Paused</option><option value="alumni">Alumni</option></select></div></div>
         </div>
       </div>
@@ -8424,7 +8424,7 @@ var r;
     // visible to kiosk caps, vitals, cancel, and renewals (mirrors the Comp Plan insert shape).
     if (!eid && r.data && r.data.id) {
       // §GUARDRAIL — record how this membership is collected; no membership goes active "silently unbilled".
-      var _bm=(document.getElementById('stuBillingMethod')&&document.getElementById('stuBillingMethod').value)||'autopay';
+      var _bm=(document.getElementById('stuBillingMethod')&&document.getElementById('stuBillingMethod').value)||'cash';
       var _jrow={ school_id:SID, student_id:r.data.id, membership_id:mid, program_id:pid, status:'active', start_date:(document.getElementById('stuStartDate').value||localDateStr(new Date())), billing_method:_bm };
       if(_bm==='autopay') _jrow.awaiting_card=true; // autopay with no card yet → flag it (internal only, no auto-send); staff sends a card link when ready
       await sb.from('student_memberships').insert(_jrow);
