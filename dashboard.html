@@ -587,7 +587,7 @@
     <div class="nav-item" id="nav-shareembed" onclick="navigate('shareembed',this)"><i class="fa-solid fa-share-nodes nav-icon"></i> Share &amp; Embed</div>
     <div class="nav-item" id="nav-settings" onclick="navigate('settings',this)"><i class="fa-solid fa-gear nav-icon"></i> Settings</div>
     <div class="nav-item" id="nav-billing"  onclick="navigate('billing',this)"><i class="fa-solid fa-file-invoice-dollar nav-icon"></i> Billing</div>
-<div class="nav-item" onclick="window.open('kiosk.html?school='+(window.schoolData&&window.schoolData.slug?window.schoolData.slug:''),'_blank')"><i class="fa-solid fa-tablet-screen-button nav-icon"></i> Kiosk Mode</div>
+<div class="nav-item" onclick="window.open('kiosk.html?school='+(window.schoolData&&window.schoolData.slug?window.schoolData.slug:'')+'&k='+(window.schoolData&&window.schoolData.kiosk_token?window.schoolData.kiosk_token:''),'_blank')"><i class="fa-solid fa-tablet-screen-button nav-icon"></i> Kiosk Mode</div>
     <div class="nav-section-label">Integrations</div>
     <div class="nav-item" id="nav-integrations" onclick="navigate('integrations',this)"><i class="fa-solid fa-trophy nav-icon"></i> Tournament</div>
   </div>
@@ -1515,6 +1515,20 @@
           <div class="field"><label>Plans to show <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.mem_plans',this)" title="Help">?</button></label><div id="memEmbedPlansPicker"><div class="empty">Loading plans...</div></div></div>
           <div style="display:flex;align-items:center;gap:0.75rem;margin:0.65rem 0"><label class="toggle-switch"><input type="checkbox" id="memEmbedRespectVis" /><div class="toggle-slider"></div></label><span class="check-item-label">Only show plans that are publicly visible <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.mem_vis',this)" title="Help">?</button></span></div>
           <div style="display:flex;align-items:center;gap:0.75rem;margin:0.65rem 0"><label class="toggle-switch"><input type="checkbox" id="memEmbedActive" checked /><div class="toggle-slider"></div></label><span class="check-item-label">Active <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_active',this)" title="Help">?</button></span></div>
+          <div class="field"><label>Custom headline (optional) <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_headline',this)" title="Help">?</button></label><input type="text" id="memEmbedHeadline" placeholder="Leave blank to use your school name" /></div>
+          <div class="field"><label>Density <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_density',this)" title="Help">?</button></label><select id="memEmbedDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div>
+          <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0"><input type="checkbox" id="memEmbedShowLogo" checked /> <span class="check-item-label">Show school logo <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_logo',this)" title="Help">?</button></span></label>
+          <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0"><input type="checkbox" id="memEmbedCustomStyle" onchange="var f=document.getElementById('memEmbedStyleFields');if(f)f.style.display=this.checked?'block':'none'" /> <span class="check-item-label">Custom colors for this embed <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_colors',this)" title="Help">?</button></span></label>
+          <div id="memEmbedStyleFields" style="display:none;border-left:2px solid var(--gold);padding-left:0.75rem;margin:0 0 0.5rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+              <div class="field"><label>Accent</label><input type="color" id="memEmbedAccent" value="#C9A84C" /></div>
+              <div class="field"><label>Background</label><input type="color" id="memEmbedBg" value="#0E0E0E" /></div>
+              <div class="field"><label>Surface / cards</label><input type="color" id="memEmbedSurface" value="#1A1A1A" /></div>
+              <div class="field"><label>Border</label><input type="color" id="memEmbedBorder" value="#333333" /></div>
+              <div class="field"><label>Text</label><input type="color" id="memEmbedFont" value="#F5F0E8" /></div>
+              <div class="field"><label>Font family</label><input type="text" id="memEmbedFontFamily" placeholder="e.g. Poppins" /></div>
+            </div>
+          </div>
           <p class="form-msg" id="memEmbedMsg"></p>
           <button class="btn-gold-full" onclick="saveMemEmbed()">Save Embed</button>
         </div>
@@ -1571,6 +1585,21 @@
           <div class="field"><label>Show <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_show',this)" title="Help">?</button></label><select id="embedFilterType" onchange="onEmbedFilterTypeChange()"><option value="all">All classes</option><option value="program">A program</option><option value="classes">Specific classes</option><option value="style">A style</option><option value="age">An age group</option><option value="level">A level</option><option value="instructor">An instructor</option></select></div>
           <div class="field" id="embedValuesField" style="display:none"><label id="embedValuesLabel">Selection</label><div id="embedValuesPicker"></div></div>
           <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0"><input type="checkbox" id="embedActive" checked /> <span class="check-item-label">Active <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_active',this)" title="Help">?</button></span></label>
+          <div class="field"><label>Default view <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_defaultview',this)" title="Help">?</button></label><select id="embedDefaultView"><option value="week">Week</option><option value="day">Day</option><option value="month">Month</option></select></div>
+          <div class="field"><label>Custom headline (optional) <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_headline',this)" title="Help">?</button></label><input type="text" id="embedHeadline" placeholder="Leave blank to use your school name" /></div>
+          <div class="field"><label>Density <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_density',this)" title="Help">?</button></label><select id="embedDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div>
+          <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0"><input type="checkbox" id="embedShowLogo" checked /> <span class="check-item-label">Show school logo <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_logo',this)" title="Help">?</button></span></label>
+          <label style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem 0"><input type="checkbox" id="embedCustomStyle" onchange="var f=document.getElementById('embedStyleFields');if(f)f.style.display=this.checked?'block':'none'" /> <span class="check-item-label">Custom colors for this embed (else it matches your app) <button class="help-hint-inline" onclick="event.stopPropagation();openHelpPopover('shareembed.emb_colors',this)" title="Help">?</button></span></label>
+          <div id="embedStyleFields" style="display:none;border-left:2px solid var(--gold);padding-left:0.75rem;margin:0 0 0.5rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+              <div class="field"><label>Accent</label><input type="color" id="embedAccent" value="#C9A84C" /></div>
+              <div class="field"><label>Background</label><input type="color" id="embedBg" value="#0E0E0E" /></div>
+              <div class="field"><label>Surface / cards</label><input type="color" id="embedSurface" value="#1A1A1A" /></div>
+              <div class="field"><label>Border</label><input type="color" id="embedBorder" value="#333333" /></div>
+              <div class="field"><label>Text</label><input type="color" id="embedFont" value="#F5F0E8" /></div>
+              <div class="field"><label>Font family</label><input type="text" id="embedFontFamily" placeholder="e.g. Poppins" /></div>
+            </div>
+          </div>
           <p class="form-msg" id="embedMsg"></p>
           <button class="btn-gold-full" onclick="saveEmbed()">Save Embed</button>
         </div>
@@ -1879,9 +1908,7 @@
   <div class="modal" style="width:580px;max-width:95vw">
     <div class="modal-header"><span class="modal-title">Change Plan</span><button class="modal-close" onclick="closePlanModal()"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="modal-body">
-      <div class="plan-card" id="planCard-starter" onclick="selectPlan('starter')"><div class="plan-name">Starter</div><div class="plan-price">$50<span>/month</span></div><div class="plan-limit">Up to 50 students</div><button class="plan-btn">Select Starter</button></div>
-      <div class="plan-card" id="planCard-professional" onclick="selectPlan('professional')"><div class="plan-name">Professional</div><div class="plan-price">$100<span>/month</span></div><div class="plan-limit">Up to 100 students</div><button class="plan-btn">Select Professional</button></div>
-      <div class="plan-card" id="planCard-elite" onclick="selectPlan('elite')"><div class="plan-name">Elite</div><div class="plan-price">$150<span>/month</span></div><div class="plan-limit">125+ students</div><button class="plan-btn">Select Elite</button></div>
+      <div style="font-size:0.9rem;color:var(--muted);line-height:1.55">NMAO is a single <strong style="color:var(--white)">$99/month</strong> plan — <strong style="color:var(--gold)">waived</strong> while your school is NMAO Accredited. Use <em>Manage Billing</em> to update your card or view invoices.</div>
       <p class="form-msg" id="planMsg"></p>
     </div>
   </div>
@@ -3568,17 +3595,37 @@ async function initSessionGuard(){
     }
     SID = school.id;
   } else {
-    // Fallback path: instructor seat (legacy support for staff hitting dashboard.html)
-    // Match on email_norm: Supabase Auth lowercases user.email, but instructors.email
-    // keeps whatever casing was typed - .eq('email',...) misses "JSmith@x.com" entirely.
-    var instrCheck = await sb.from('instructors').select('id,school_id').eq('email_norm', String(user.email||'').trim().toLowerCase()).eq('active', true).single();
-    if(instrCheck.error || !instrCheck.data){
-      showSessionError(user, 'no-school');
-      return false;
+    // §AUTO-CREATE (O1) — a signup completed after an email-confirm bounce leaves an authed user with
+    // no school row (register-school only ran at signup if a session existed). If this user carries a
+    // pending school_name from signup metadata, create the school now (register-school is idempotent).
+    var pendingName = (user.user_metadata && user.user_metadata.school_name) ? String(user.user_metadata.school_name).trim() : '';
+    if(pendingName){
+      try{
+        var mk = await fetch(SURL + '/functions/v1/register-school', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},
+          body: JSON.stringify({ school_name: pendingName, email: user.email })
+        });
+        var mkBody = await mk.json().catch(function(){ return {}; });
+        if(mk.ok && !mkBody.error){   // §AUTO-CREATE: register-school returns HTTP 200 even on internal errors — check the body too
+          var sr2 = await sb.from('schools').select('id,name,email,is_active').eq('owner_id', user.id).limit(1);
+          if(!sr2.error && sr2.data && sr2.data.length){ school = sr2.data[0]; SID = school.id; }
+        } else if(mkBody.error){ console.error('[session-guard] register-school reported:', mkBody.error); }
+      }catch(e){ console.error('[session-guard] auto-create school failed:', e); }
     }
-    SID = instrCheck.data.school_id;
-    var s2 = await sb.from('schools').select('id,name,email,is_active').eq('id', SID).single();
-    if(s2.data) school = s2.data;
+    if(!school){
+      // Fallback path: instructor seat (legacy support for staff hitting dashboard.html)
+      // Match on email_norm: Supabase Auth lowercases user.email, but instructors.email
+      // keeps whatever casing was typed - .eq('email',...) misses "JSmith@x.com" entirely.
+      var instrCheck = await sb.from('instructors').select('id,school_id').eq('email_norm', String(user.email||'').trim().toLowerCase()).eq('active', true).single();
+      if(instrCheck.error || !instrCheck.data){
+        showSessionError(user, 'no-school');
+        return false;
+      }
+      SID = instrCheck.data.school_id;
+      var s2 = await sb.from('schools').select('id,name,email,is_active').eq('id', SID).single();
+      if(s2.data) school = s2.data;
+    }
   }
 
   ownerEmail = user.email;
@@ -4315,16 +4362,22 @@ function renderPlanCancelledBanner(cancelled){
 }
 function updatePlanBadge(plan) {
   var sd = window.schoolData || {};
-  var price = sd.plan_price ? sd.plan_price : 99;
   var statusMap = {trialing:'Free Trial', active:'Active', past_due:'Past Due', cancelled:'Cancelled'};
   var status = statusMap[sd.plan_status] || 'Active';
   renderPlanCancelledBanner(sd.plan_status === 'cancelled');
-  var line = '$' + price + '/month \u00b7 ' + status;
-  if (sd.plan_status === 'trialing' && sd.trial_ends_at) {
+  // \u00a7PRICE-CANON \u2014 one plan, $99/mo (waived with accreditation). Never a stored per-school price.
+  var line;
+  if (sd.accredited) {
+    line = '$99/month \u00b7 waived with accreditation';                     // \u00a7WAIVER
+  } else if (sd.trial_ends_at == null) {
+    line = '$99/month \u00b7 complimentary';                                 // founder/comp exempt (no trial clock)
+  } else if (sd.plan_status === 'trialing' && sd.trial_ends_at) {
     var ends = new Date(sd.trial_ends_at);
-    line = '$' + price + '/month \u00b7 Free trial ends ' +
+    line = '$99/month \u00b7 Free trial ends ' +
            ends.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) +
            ' \u00b7 no platform fee until then';
+  } else {
+    line = '$99/month \u00b7 ' + status;
   }
   document.getElementById('billingPlanName').textContent = 'NMAO Platform';
   document.getElementById('billingPlanPrice').textContent = line;
@@ -4487,7 +4540,7 @@ async function saveClassFieldSettings(){
 //  SHARE & EMBED 
 var allEmbeds = [];
 
-function embEsc(s){ return (''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function embEsc(s){ return (''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function embFindById(arr,id){ for(var i=0;i<arr.length;i++){ if(arr[i].id===id) return arr[i]; } return null; }
 function embedDistinct(field){ var seen={},out=[]; for(var i=0;i<allClasses.length;i++){ var v=allClasses[i][field]; if(v&&!seen[v]){ seen[v]=true; out.push(v); } } out.sort(); return out; }
 function embedLinkFor(id){ return window.location.origin+'/classes.html?embed='+id; }
@@ -4522,7 +4575,7 @@ function renderEmbedsList(){
     var state=e.active?'<span style="font-size:0.7rem;color:var(--gold);margin-left:0.4rem">Active</span>':'<span style="font-size:0.7rem;color:var(--muted);margin-left:0.4rem">Off</span>';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:0.85rem 0;border-bottom:1px solid var(--border)">';
     html+='<div><div style="font-weight:600">'+embEsc(e.name)+state+'</div>';
-    html+='<div style="font-size:0.82rem;color:var(--muted);margin-top:0.15rem">'+embedFilterSummary(e)+'</div></div>';
+    html+='<div style="font-size:0.82rem;color:var(--muted);margin-top:0.15rem">'+embedFilterSummary(e)+(e.view_count?' · '+e.view_count+(e.view_count===1?' view':' views'):'')+'</div></div>';
     html+='<div style="display:flex;gap:0.4rem;flex-shrink:0">';
     html+='<button class="btn-sm gold" onclick="openEmbedCode(\''+e.id+'\')">Get code</button>';
     html+='<button class="btn-sm" onclick="copyEmbedLink(\''+e.id+'\')">Copy link</button>';
@@ -4593,6 +4646,19 @@ function openEmbedModal(id){
   document.getElementById('embedActive').checked=e?!!e.active:true;
   setMsg('embedMsg','','');
   renderEmbedValuePicker(e?e.filter_type:'all', e?(e.filter_values||[]):[]);
+  document.getElementById('embedDefaultView').value=(e&&e.default_view)||'week';
+  document.getElementById('embedHeadline').value=(e&&e.headline)||'';
+  document.getElementById('embedDensity').value=(e&&e.density)||'comfortable';
+  document.getElementById('embedShowLogo').checked=e?(e.show_logo!==false):true;
+  var _hasStyle=!!(e&&(e.accent_color||e.bg_color||e.surface_color||e.border_color||e.font_color||e.font_family));
+  document.getElementById('embedCustomStyle').checked=_hasStyle;
+  document.getElementById('embedStyleFields').style.display=_hasStyle?'block':'none';
+  document.getElementById('embedAccent').value=(e&&e.accent_color)||'#C9A84C';
+  document.getElementById('embedBg').value=(e&&e.bg_color)||'#0E0E0E';
+  document.getElementById('embedSurface').value=(e&&e.surface_color)||'#1A1A1A';
+  document.getElementById('embedBorder').value=(e&&e.border_color)||'#333333';
+  document.getElementById('embedFont').value=(e&&e.font_color)||'#F5F0E8';
+  document.getElementById('embedFontFamily').value=(e&&e.font_family)||'';
   document.getElementById('embedModal').classList.add('active');
 }
 
@@ -4605,7 +4671,20 @@ async function saveEmbed(){
   var values=collectEmbedValues(type);
   if(type!=='all'&&!values.length){ setMsg('embedMsg','Please choose what this embed shows.','error'); return; }
   var id=document.getElementById('embedEditId').value;
-  var row={ school_id:SID, name:name, filter_type:type, filter_values:values, active:document.getElementById('embedActive').checked, updated_at:new Date().toISOString() };
+  var custom=document.getElementById('embedCustomStyle').checked;
+  var row={ school_id:SID, name:name, filter_type:type, filter_values:values,
+    active:document.getElementById('embedActive').checked,
+    default_view:document.getElementById('embedDefaultView').value,
+    headline:(document.getElementById('embedHeadline').value.trim()||null),
+    density:document.getElementById('embedDensity').value,
+    show_logo:document.getElementById('embedShowLogo').checked,
+    accent_color:custom?document.getElementById('embedAccent').value:null,
+    bg_color:custom?document.getElementById('embedBg').value:null,
+    surface_color:custom?document.getElementById('embedSurface').value:null,
+    border_color:custom?document.getElementById('embedBorder').value:null,
+    font_color:custom?document.getElementById('embedFont').value:null,
+    font_family:custom?(document.getElementById('embedFontFamily').value.trim()||null):null,
+    updated_at:new Date().toISOString() };
   var r=id?(await sb.from('schedule_embeds').update(row).eq('id',id)):(await sb.from('schedule_embeds').insert(row));
   if(r.error){ setMsg('embedMsg',r.error.message,'error'); return; }
   closeEmbedModal(); loadScheduleEmbeds();
@@ -4690,7 +4769,7 @@ function renderMemEmbedsList(){
     var state=e.active?'<span style="font-size:0.7rem;color:var(--gold);margin-left:0.4rem">Active</span>':'<span style="font-size:0.7rem;color:var(--muted);margin-left:0.4rem">Off</span>';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:0.85rem 0;border-bottom:1px solid var(--border)">';
     html+='<div><div style="font-weight:600">'+embEsc(e.name)+state+'</div>';
-    html+='<div style="font-size:0.82rem;color:var(--muted);margin-top:0.15rem">'+embEsc(memEmbedPlanSummary(e))+'</div></div>';
+    html+='<div style="font-size:0.82rem;color:var(--muted);margin-top:0.15rem">'+embEsc(memEmbedPlanSummary(e))+(e.view_count?' · '+e.view_count+(e.view_count===1?' view':' views'):'')+'</div></div>';
     html+='<div style="display:flex;gap:0.4rem;flex-shrink:0">';
     html+='<button class="btn-sm gold" onclick="openMemEmbedCode(\''+e.id+'\')">Get code</button>';
     html+='<button class="btn-sm" onclick="copyMemEmbedLink(\''+e.id+'\')">Copy link</button>';
@@ -4755,6 +4834,18 @@ function openMemEmbedModal(id){
   document.getElementById('memEmbedActive').checked=e?!!e.active:true;
   setMsg('memEmbedMsg','','');
   renderMemEmbedPlansPicker(e?(e.membership_ids||[]):[]);
+  document.getElementById('memEmbedHeadline').value=(e&&e.headline)||'';
+  document.getElementById('memEmbedDensity').value=(e&&e.density)||'comfortable';
+  document.getElementById('memEmbedShowLogo').checked=e?(e.show_logo!==false):true;
+  var _ms=!!(e&&(e.accent_color||e.bg_color||e.surface_color||e.border_color||e.font_color||e.font_family));
+  document.getElementById('memEmbedCustomStyle').checked=_ms;
+  document.getElementById('memEmbedStyleFields').style.display=_ms?'block':'none';
+  document.getElementById('memEmbedAccent').value=(e&&e.accent_color)||'#C9A84C';
+  document.getElementById('memEmbedBg').value=(e&&e.bg_color)||'#0E0E0E';
+  document.getElementById('memEmbedSurface').value=(e&&e.surface_color)||'#1A1A1A';
+  document.getElementById('memEmbedBorder').value=(e&&e.border_color)||'#333333';
+  document.getElementById('memEmbedFont').value=(e&&e.font_color)||'#F5F0E8';
+  document.getElementById('memEmbedFontFamily').value=(e&&e.font_family)||'';
   document.getElementById('memEmbedModal').classList.add('active');
 }
 
@@ -4766,7 +4857,18 @@ async function saveMemEmbed(){
   var ids=collectMemEmbedPlans();
   if(!ids.length){ setMsg('memEmbedMsg','Please choose at least one plan to show.','error'); return; }
   var id=document.getElementById('memEmbedEditId').value;
-  var row={ school_id:SID, name:name, membership_ids:ids, respect_visibility:document.getElementById('memEmbedRespectVis').checked, active:document.getElementById('memEmbedActive').checked, updated_at:new Date().toISOString() };
+  var _mc=document.getElementById('memEmbedCustomStyle').checked;
+  var row={ school_id:SID, name:name, membership_ids:ids, respect_visibility:document.getElementById('memEmbedRespectVis').checked, active:document.getElementById('memEmbedActive').checked,
+    headline:(document.getElementById('memEmbedHeadline').value.trim()||null),
+    density:document.getElementById('memEmbedDensity').value,
+    show_logo:document.getElementById('memEmbedShowLogo').checked,
+    accent_color:_mc?document.getElementById('memEmbedAccent').value:null,
+    bg_color:_mc?document.getElementById('memEmbedBg').value:null,
+    surface_color:_mc?document.getElementById('memEmbedSurface').value:null,
+    border_color:_mc?document.getElementById('memEmbedBorder').value:null,
+    font_color:_mc?document.getElementById('memEmbedFont').value:null,
+    font_family:_mc?(document.getElementById('memEmbedFontFamily').value.trim()||null):null,
+    updated_at:new Date().toISOString() };
   var r=id?(await sb.from('membership_embeds').update(row).eq('id',id)):(await sb.from('membership_embeds').insert(row));
   if(r.error){ setMsg('memEmbedMsg',r.error.message,'error'); return; }
   closeMemEmbedModal(); loadMembershipEmbeds();
@@ -5174,6 +5276,11 @@ var HELP_CONTENT = {
   'shareembed.mem_plans': { title: 'Plans to show', purpose: 'Pick which membership plans appear in this embed and in what order. Leave out anything you do not want shown on your public site.' },
   'shareembed.mem_vis': { title: 'Only publicly visible plans', purpose: 'When on, the embed automatically hides any plan that is not marked public \u2014 so private or internal plans never show on your website even if selected.' },
   'shareembed.emb_code': { title: 'Embed code', purpose: 'Copy this snippet and paste it into any page on your website \u2014 it renders the live view right there. Copy link only gives a plain URL instead, for linking rather than embedding. The preview below shows exactly what visitors will see.' },
+  'shareembed.emb_defaultview': { title: 'Default view', purpose: 'Which calendar layout this schedule embed opens in \u2014 Week (a full week grid), Day (a single day), or Month (a monthly overview). Visitors can still switch; this just sets what they land on first.' },
+  'shareembed.emb_headline': { title: 'Custom headline', purpose: 'A short line of text shown at the top of the embed (like \u201cKids Class Schedule\u201d or \u201cChoose Your Plan\u201d). Leave it blank and the embed uses your school name automatically.' },
+  'shareembed.emb_density': { title: 'Density', purpose: 'How tightly packed the embed looks. Comfortable gives roomy spacing; Compact shrinks everything slightly to fit a small space like a website sidebar.' },
+  'shareembed.emb_logo': { title: 'Show school logo', purpose: 'Whether your logo shows at the top of the embed. Turn it off when the page you are pasting into already displays your logo, so it is not repeated.' },
+  'shareembed.emb_colors': { title: 'Custom colors', purpose: 'By default the embed matches your app\u2019s colors and font. Turn this on to give THIS embed its own accent, background, card, border, text color and font \u2014 so it blends into a website whose branding differs from your NMAO app. The schedule/plans shown always stay live; only the look changes. Views each embed receives are counted and shown next to it in the list.' },
 
   'schedule.shifts': { title: 'Schedule Shifts', purpose: 'A temporary change to your schedule for a set date range \u2014 holiday weeks, summer hours, a seasonal break \u2014 without editing your normal classes. When the dates pass, everything returns to normal on its own. Members can be reminded before it starts.' },
   'schedule.sh_name': { title: 'Name', purpose: 'A short label so you recognize this shift later, like "Summer Hours" or "Thanksgiving Week." Members don\'t see this name \u2014 it\'s just for you.' },
@@ -5830,32 +5937,8 @@ function toggleSidebar(){ document.body.classList.toggle('sidebar-open'); }
 function closeSidebar(){ document.body.classList.remove('sidebar-open'); }
 document.addEventListener('click',function(e){ var m=document.getElementById('importMenu'); if(m&&m.classList.contains('open')&&(!e.target.closest||!e.target.closest('#importMenu'))){ m.classList.remove('open'); } });
 
-// §A11Y-MODALS — accessibility for every .modal-overlay dialog, applied CENTRALLY (no per-modal
-// change, purely additive): role/aria on open, focus the first field, Escape closes, Tab trapped
-// inside, focus restored on close. Makes the app keyboard/screen-reader usable for procurement.
-(function(){
-  var lastFocus=null;
-  function inner(ov){ return ov.querySelector('.modal') || ov; }
-  function focusables(root){ return Array.prototype.slice.call(root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function(el){ return el.offsetParent!==null; }); }
-  function onOpen(ov){
-    var m=inner(ov);
-    m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true');
-    var t=m.querySelector('.modal-title'); if(t){ if(!t.id){ t.id='mtitle-'+Math.random().toString(36).slice(2,8); } m.setAttribute('aria-labelledby',t.id); }
-    lastFocus=document.activeElement;
-    var pref=m.querySelector('input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])')||focusables(m)[0];
-    if(pref){ setTimeout(function(){ try{ pref.focus(); }catch(e){} }, 30); }
-  }
-  document.addEventListener('keydown',function(e){
-    var ov=document.querySelector('.modal-overlay.active'); if(!ov) return;
-    if(e.key==='Escape'){ var c=ov.querySelector('.modal-close'); if(c){ e.preventDefault(); c.click(); } return; }
-    if(e.key==='Tab'){ var fs=focusables(inner(ov)); if(!fs.length) return; var first=fs[0],last=fs[fs.length-1];
-      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } }
-  });
-  var mo=new MutationObserver(function(muts){ for(var i=0;i<muts.length;i++){ var ov=muts[i].target; if(ov.classList && ov.classList.contains('modal-overlay')){ if(ov.classList.contains('active')){ onOpen(ov); } else if(lastFocus){ try{ lastFocus.focus(); }catch(e){} lastFocus=null; } } } });
-  function observeAll(){ var list=document.querySelectorAll('.modal-overlay'); for(var i=0;i<list.length;i++){ mo.observe(list[i],{attributes:true,attributeFilter:['class']}); } }
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',observeAll); } else { observeAll(); }
-})();
+// §A11Y-MODALS lives once, at end of <body> (search "§A11Y-MODALS") — role/aria-modal, focus
+// management, Tab-trap, and Escape for every .modal-overlay, incl. dynamically-injected ones.
 document.addEventListener('click',function(e){
   if(!e.target.closest('#schoolBtn'))  document.getElementById('schoolMenu').style.display='none';
   if(!e.target.closest('.topbar-right')) document.getElementById('quickAddMenu').classList.remove('open');
@@ -5909,11 +5992,11 @@ async function updateRevenueGoalWidget(goal){
 
 // Setup checklist
 async function buildSetupChecklist(){
-  var stripeConnected=false, hasBrand=false;
+  var stripeConnected=false, stripeOnboarded=false, hasBrand=false;
   try{
-    var _scr=await sb.from('schools').select('stripe_connected,logo_url,color').eq('id',SID).single();
+    var _scr=await sb.from('schools').select('stripe_connected,stripe_onboarded,logo_url,color').eq('id',SID).single();
     if(_scr&&_scr.data){
-      stripeConnected=!!_scr.data.stripe_connected;
+      stripeConnected=!!_scr.data.stripe_connected; stripeOnboarded=!!_scr.data.stripe_onboarded;
       hasBrand=!!(_scr.data.logo_url||_scr.data.color);
     }
   }catch(e){}
@@ -5923,7 +6006,7 @@ async function buildSetupChecklist(){
     {key:'memberships',  label:'Set up memberships',             why:'How members pay to train with you.',                ctaLabel:'Add a membership',   cta:'openAddMembership()',  requires:['programs'],                check:function(){return allMemberships.length>0;},  nav:'memberships'},
     {key:'classes',      label:'Add your classes',               why:'Put your weekly schedule on the calendar.',         ctaLabel:'Add a class',        cta:'openAddClass()',       requires:['programs'],                check:function(){return allClasses.length>0;},      nav:'classes'},
     {key:'students',     label:'Add your students',              why:'Add them one at a time or import a CSV.',           ctaLabel:'Add a student',      cta:'openAddStudent()',     requires:['programs','memberships'],  check:function(){return allStudents.length>0;},     nav:'members'},
-    {key:'stripe',       label:'Connect Stripe to get paid',     why:'Connect Stripe so you can accept payments.',        ctaLabel:'Connect Stripe',     cta:'connectStripe()',      requires:[],                          check:function(){return stripeConnected;},          nav:'billing'},
+    {key:'stripe',       label:(stripeConnected&&!stripeOnboarded)?'Finish verifying with Stripe':'Connect Stripe to get paid', why:(stripeConnected&&!stripeOnboarded)?'You connected Stripe but must finish verification before you can accept payments.':'Connect Stripe so you can accept payments.', ctaLabel:(stripeConnected&&!stripeOnboarded)?'Finish verifying':'Connect Stripe', cta:(stripeConnected&&!stripeOnboarded)?"window.open('https://dashboard.stripe.com/','_blank')":'connectStripe()', requires:[], check:function(){return stripeOnboarded;}, nav:'billing'},   // §STRIPE-TRUTH: done = charge-able, not just OAuth-linked
     {key:'instructors',  label:'Invite your instructors',        why:'Give your staff their own login.',                  ctaLabel:'Add an instructor',  cta:'openAddInstructor()',  requires:[],                          check:function(){return allInstructors.length>0;},  nav:'instructors'},
     {key:'sessiontypes', label:'Add session types',              why:'For private lessons and session packs.',            ctaLabel:'Add a session type', cta:'openAddSessionType()', requires:[],                          check:function(){return allSessionTypes.length>0;}, nav:'sessions'},
     {key:'sessionpacks', label:'Configure a session pack',       why:'Sell prepaid blocks of sessions.',                  ctaLabel:'Add a session pack', cta:'openAddSessionPack()',   requires:['sessiontypes'],            check:function(){return allSessionPacks.length>0;}, nav:'sessions'},
@@ -6142,7 +6225,7 @@ function openDayView(dateStr,dayName){
   }
   if(daySessions.length){
     html+='<div style="font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#9060D0;margin:1rem 0 0.5rem">Sessions</div>';
-    daySessions.forEach(function(s){var st=allSessionTypes.find(function(t){return t.id===s.session_type_id;});var typeName=st?st.name:'Session';var stu=allStudents.find(function(x){return x.id===s.student_id;});var stuName=stu?stu.first_name+' '+stu.last_name:'';html+='<div style="padding:0.75rem;background:rgba(130,80,220,0.08);border:1px solid rgba(130,80,220,0.3);border-left:2px solid #9060D0;margin-bottom:0.4rem;cursor:pointer" onclick="openBookSession(\''+s.id+'\')"><div style="font-size:0.88rem;color:#B090E8">'+typeName+'</div>'+(stuName?'<div style="font-size:0.75rem;color:var(--muted)">'+stuName+'</div>':'')+'</div>';});
+    daySessions.forEach(function(s){var st=allSessionTypes.find(function(t){return t.id===s.session_type_id;});var typeName=st?st.name:'Session';var stu=allStudents.find(function(x){return x.id===s.student_id;});var stuName=stu?stu.first_name+' '+stu.last_name:'';html+='<div style="padding:0.75rem;background:rgba(130,80,220,0.08);border:1px solid rgba(130,80,220,0.3);border-left:2px solid #9060D0;margin-bottom:0.4rem;cursor:pointer" onclick="openBookSession(\''+s.id+'\')"><div style="font-size:0.88rem;color:#B090E8">'+typeName+'</div>'+(stuName?'<div style="font-size:0.75rem;color:var(--muted)">'+escapeCheckout(stuName)+'</div>':'')+'</div>';});
   }
   if(tests.length){
     html+='<div style="font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#7DAAD4;margin:1rem 0 0.5rem">Belt Tests</div>';
@@ -6150,7 +6233,7 @@ function openDayView(dateStr,dayName){
   }
   if(birthdays.length){
     html+='<div style="font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5A9A6A;margin:1rem 0 0.5rem">Birthdays</div>';
-    birthdays.forEach(function(s){html+='<div style="font-size:0.88rem;color:#7DBD7D;padding:0.4rem 0">\uD83C\uDF82 '+s.first_name+' '+s.last_name+'</div>';});
+    birthdays.forEach(function(s){html+='<div style="font-size:0.88rem;color:#7DBD7D;padding:0.4rem 0">\uD83C\uDF82 '+escapeCheckout(s.first_name+' '+s.last_name)+'</div>';});
   }
   if(!dayClasses.length&&!daySessions.length&&!tests.length&&!birthdays.length){html='<div style="color:var(--muted);font-style:italic;font-size:0.85rem;padding:1rem 0">Nothing scheduled this day.</div>';}
   document.getElementById('dayViewContent').innerHTML=html;
@@ -6555,7 +6638,7 @@ async function buildRetentionAlerts(){
     }
     if(!atRisk.length){document.getElementById('retentionAlertsSection').style.display='none';return;}
     document.getElementById('retentionAlertsSection').style.display='block';
-    document.getElementById('retentionAlertsList').innerHTML=atRisk.slice(0,10).map(function(item){var s=item.student;var label=item.daysAgo?item.daysAgo+' days ago':'Never attended';return '<div class="alert-card"><div><div class="alert-name">'+s.first_name+' '+s.last_name+'</div><div class="alert-meta">Last class: '+label+'</div></div><button class="btn-sm gold" onclick="openStudentProfile(\''+s.id+'\')">View Profile</button></div>';}).join('');
+    document.getElementById('retentionAlertsList').innerHTML=atRisk.slice(0,10).map(function(item){var s=item.student;var label=item.daysAgo?item.daysAgo+' days ago':'Never attended';return '<div class="alert-card"><div><div class="alert-name">'+escapeCheckout(s.first_name)+' '+escapeCheckout(s.last_name)+'</div><div class="alert-meta">Last class: '+label+'</div></div><button class="btn-sm gold" onclick="openStudentProfile(\''+s.id+'\')">View Profile</button></div>';}).join('');
   }catch(e){}
 }
 function buildBirthdays(){
@@ -6564,7 +6647,7 @@ function buildBirthdays(){
   upcoming.sort(function(a,b){return a.daysUntil-b.daysUntil;});
   var el=document.getElementById('birthdaysList');
   if(!upcoming.length){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.85rem">No birthdays in the next 30 days.</div>';return;}
-  el.innerHTML=upcoming.map(function(item){var s=item.student;var label=item.daysUntil===0?'Today!':item.daysUntil===1?'Tomorrow':item.bday.toLocaleDateString('en-US',{month:'short',day:'numeric'});var isToday=item.daysUntil===0;return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:var(--surface);border:1px solid var(--border);border-left:2px solid #5A9A6A;margin-bottom:0.4rem"><div style="font-size:0.92rem;color:var(--white)"><i class="fa-solid fa-cake-candles" style="color:#5A9A6A;margin-right:0.5rem"></i>'+s.first_name+' '+s.last_name+(isToday?' \uD83C\uDF82':'')+'</div><div style="font-size:0.78rem;color:'+(isToday?'#7DBD7D':'var(--muted)')+'">'+label+'</div></div>';}).join('');
+  el.innerHTML=upcoming.map(function(item){var s=item.student;var label=item.daysUntil===0?'Today!':item.daysUntil===1?'Tomorrow':item.bday.toLocaleDateString('en-US',{month:'short',day:'numeric'});var isToday=item.daysUntil===0;return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:var(--surface);border:1px solid var(--border);border-left:2px solid #5A9A6A;margin-bottom:0.4rem"><div style="font-size:0.92rem;color:var(--white)"><i class="fa-solid fa-cake-candles" style="color:#5A9A6A;margin-right:0.5rem"></i>'+escapeCheckout(s.first_name)+' '+escapeCheckout(s.last_name)+(isToday?' \uD83C\uDF82':'')+'</div><div style="font-size:0.78rem;color:'+(isToday?'#7DBD7D':'var(--muted)')+'">'+label+'</div></div>';}).join('');
 }
 
 // Revenue
@@ -6668,7 +6751,7 @@ async function openRevenueBreakdown(period){
     var byType={};data.forEach(function(p){var t=p.type||'other';if(!byType[t])byType[t]=0;byType[t]+=netCashAmount(p);});
     window._revBreakdownData=data; window._memberDrillBuilt=false; window._sessDrillBuilt=false; window._packDrillBuilt=false; window._retailDrillBuilt=false; Object.keys(byType).sort().forEach(function(t){ if(t==='session_pack'){ html+='<div class="rev-breakdown-item" style="cursor:pointer" onclick="togglePackDrill()"><div style="font-size:0.85rem;color:var(--white)"><i class="fa-solid fa-chevron-right" id="packDrillChev" style="font-size:0.7rem;color:var(--gold);margin-right:0.45rem;transition:transform 0.2s"></i>'+(typeLabels[t]||t)+'</div><div style="font-size:0.88rem;color:var(--gold)">$'+byType[t].toFixed(2)+'</div></div><div id="packDrill" style="display:none;padding:0.1rem 0 0.4rem 0.9rem"></div>'; return; } if(t==='session'){ html+='<div class="rev-breakdown-item" style="cursor:pointer" onclick="toggleSessionDrill()"><div style="font-size:0.85rem;color:var(--white)"><i class="fa-solid fa-chevron-right" id="sessDrillChev" style="font-size:0.7rem;color:var(--gold);margin-right:0.45rem;transition:transform 0.2s"></i>'+(typeLabels[t]||t)+'</div><div style="font-size:0.88rem;color:var(--gold)">$'+byType[t].toFixed(2)+'</div></div><div id="sessDrill" style="display:none;padding:0.1rem 0 0.4rem 0.9rem"></div>'; return; } if(t==='membership'){ html+='<div class="rev-breakdown-item" style="cursor:pointer" onclick="toggleMemberDrill()"><div style="font-size:0.85rem;color:var(--white)"><i class="fa-solid fa-chevron-right" id="memberDrillChev" style="font-size:0.7rem;color:var(--gold);margin-right:0.45rem;transition:transform 0.2s"></i>'+(typeLabels[t]||t)+'</div><div style="font-size:0.88rem;color:var(--gold)">$'+byType[t].toFixed(2)+'</div></div><div id="memberDrill" style="display:none;padding:0.1rem 0 0.4rem 0.9rem"></div>'; return; } if(t==='retail_sale'){ html+='<div class="rev-breakdown-item" style="cursor:pointer" onclick="toggleRetailDrill()"><div style="font-size:0.85rem;color:var(--white)"><i class="fa-solid fa-chevron-right" id="retailDrillChev" style="font-size:0.7rem;color:var(--gold);margin-right:0.45rem;transition:transform 0.2s"></i>'+(typeLabels[t]||t)+'</div><div style="font-size:0.88rem;color:var(--gold)">$'+byType[t].toFixed(2)+'</div></div><div id="retailDrill" style="display:none;padding:0.1rem 0 0.4rem 0.9rem"></div>'; return; } html+='<div class="rev-breakdown-item"><div style="font-size:0.85rem;color:var(--white)">'+(typeLabels[t]||t)+'</div><div style="font-size:0.88rem;color:var(--gold)">$'+byType[t].toFixed(2)+'</div></div>';});
     html+='<div style="font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin:1rem 0 0.5rem">Transactions</div>';
-    data.slice(0,20).forEach(function(p){var s=p.students;var name=s?s.first_name+' '+s.last_name:'Walk-in';var cash=netCashAmount(p);var credC=0;var tt=(p.payment_tenders||[]);for(var k=0;k<tt.length;k++){if(tt[k].tender_type==='credit')credC+=(tt[k].amount_cents||0);}var creditNote=credC>0?(' <span style="font-size:0.68rem;color:var(--muted)">(+$'+(credC/100).toFixed(2)+' credit)</span>'):'';html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem"><div><div style="color:var(--white)">'+name+'</div><div style="font-size:0.72rem;color:var(--muted)">'+(typeLabels[p.type]||p.type||'Payment')+'</div></div><div style="color:var(--gold)">$'+cash.toFixed(2)+creditNote+'</div></div>';});
+    data.slice(0,20).forEach(function(p){var s=p.students;var name=s?s.first_name+' '+s.last_name:'Walk-in';var cash=netCashAmount(p);var credC=0;var tt=(p.payment_tenders||[]);for(var k=0;k<tt.length;k++){if(tt[k].tender_type==='credit')credC+=(tt[k].amount_cents||0);}var creditNote=credC>0?(' <span style="font-size:0.68rem;color:var(--muted)">(+$'+(credC/100).toFixed(2)+' credit)</span>'):'';html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem"><div><div style="color:var(--white)">'+escapeCheckout(name)+'</div><div style="font-size:0.72rem;color:var(--muted)">'+(typeLabels[p.type]||p.type||'Payment')+'</div></div><div style="color:var(--gold)">$'+cash.toFixed(2)+creditNote+'</div></div>';});
   }
   document.getElementById('revBreakdownList').innerHTML=html;
 }
@@ -6872,7 +6955,7 @@ function renderSessionsFiltered(list){
     var dt=s.session_date?new Date(s.session_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}):'--';
     var statusColor={scheduled:'#7DAAD4',completed:'#5A9A6A',cancelled:'#E07070'}[s.status]||'var(--muted)';
     var borderColor=(st&&st.color)?st.color:'#9060D0';
-    return '<div class="session-card" style="border-left-color:'+borderColor+'"><div><div class="session-card-title">'+typeName+' \u2014 '+stuName+'</div><div class="session-card-meta">'+dt+(s.start_time?' at '+fmtTime(s.start_time):'')+(s.instructor_name?' \u00B7 '+s.instructor_name:'')+(s.price&&s.price>0?' \u00B7 $'+parseFloat(s.price).toFixed(2):'')+'</div></div><div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0"><span style="font-size:0.72rem;color:'+statusColor+'">'+s.status+'</span><button class="btn-sm" onclick="openBookSession(\''+s.id+'\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn-sm" style="color:#E07070;border-color:rgba(224,112,112,0.4)" onclick="deleteSession(\''+s.id+'\')"><i class="fa-solid fa-trash"></i></button></div></div>';
+    return '<div class="session-card" style="border-left-color:'+borderColor+'"><div><div class="session-card-title">'+typeName+' \u2014 '+escapeCheckout(stuName)+'</div><div class="session-card-meta">'+dt+(s.start_time?' at '+fmtTime(s.start_time):'')+(s.instructor_name?' \u00B7 '+s.instructor_name:'')+(s.price&&s.price>0?' \u00B7 $'+parseFloat(s.price).toFixed(2):'')+'</div></div><div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0"><span style="font-size:0.72rem;color:'+statusColor+'">'+s.status+'</span><button class="btn-sm" onclick="openBookSession(\''+s.id+'\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn-sm" style="color:#E07070;border-color:rgba(224,112,112,0.4)" onclick="deleteSession(\''+s.id+'\')"><i class="fa-solid fa-trash"></i></button></div></div>';
   }).join('');
 }
 async function deleteSession(sid){ if(!confirm('Delete this session?')) return; await sb.from('sessions').delete().eq('id',sid); await loadSessions(); buildCalendar(); if(calView==='month')buildMonthCalendar(); }
@@ -7117,8 +7200,8 @@ function openBookSessionForStudent(){ if(currentProfileStudent){sessionBookStude
 function openBookSessionForInstructor(){ if(currentInstructorProfile){sessionBookInstructorName=currentInstructorProfile.first_name+' '+currentInstructorProfile.last_name;} openBookSession(); }
 function populateSessionTypeDropdown(){ var sel=document.getElementById('sessionTypeSelect');sel.innerHTML='<option value="">-- Select Type --</option>';allSessionTypes.forEach(function(t){var o=document.createElement('option');o.value=t.id;o.textContent=t.name;sel.appendChild(o);}); }
 function populateSessionInstructorDropdown(){ var sel=document.getElementById('sessionInstructor');sel.innerHTML='<option value="">-- Select Instructor --</option>';allInstructors.forEach(function(i){var o=document.createElement('option');o.value=i.first_name+' '+i.last_name;o.textContent=i.first_name+' '+i.last_name;sel.appendChild(o);}); }
-function searchSessionStudent(){ var q=document.getElementById('sessionStudentSearch').value.toLowerCase().trim();var el=document.getElementById('sessionStudentResults');if(!q||q.length<2){el.style.display='none';return;}var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q);}).slice(0,6);el.style.display='block';if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No students found.</div>';return;}el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="selectSessionStudent(\''+s.id+'\',\''+s.first_name+' '+s.last_name+'\')">'+s.first_name+' '+s.last_name+'</div>';}).join('');}
-function selectSessionStudent(sid,name){ document.getElementById('sessionStudentId').value=sid;document.getElementById('sessionStudentSearch').value=name;document.getElementById('sessionSelectedStudentName').textContent=name;document.getElementById('sessionSelectedStudent').style.display='block';document.getElementById('sessionStudentResults').style.display='none'; updateBookSessionCheckoutButtons(); }
+function searchSessionStudent(){ var q=document.getElementById('sessionStudentSearch').value.toLowerCase().trim();var el=document.getElementById('sessionStudentResults');if(!q||q.length<2){el.style.display='none';return;}var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q);}).slice(0,6);el.style.display='block';if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No students found.</div>';return;}el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="selectSessionStudent(\''+s.id+'\')">'+escapeCheckout(s.first_name+' '+s.last_name)+'</div>';}).join('');}
+function selectSessionStudent(sid){ var _s=allStudents.find(function(x){return x.id===sid;}); var name=_s?(_s.first_name+' '+_s.last_name):''; document.getElementById('sessionStudentId').value=sid;document.getElementById('sessionStudentSearch').value=name;document.getElementById('sessionSelectedStudentName').textContent=name;document.getElementById('sessionSelectedStudent').style.display='block';document.getElementById('sessionStudentResults').style.display='none'; updateBookSessionCheckoutButtons(); }
 function clearSessionStudent(){ document.getElementById('sessionStudentId').value='';document.getElementById('sessionStudentSearch').value='';document.getElementById('sessionSelectedStudent').style.display='none'; updateBookSessionCheckoutButtons(); }
 
 // §BOOK-SESSION-CHECKOUT — Three payment paths for session booking (Phase N Block 8, 2026-05-11)
@@ -7388,12 +7471,13 @@ var saveResult = await saveSessionRow();
     return;
   }
 
+  var _bsBtn = document.getElementById('bookSessionBtnCardOnFile'); if(_bsBtn) _bsBtn.disabled = true;   // §NO-DOUBLE-CHARGE: block double-click
   setMsg('sessionMsg','Charging card on file...','');
   try{
     var r = await fetch(SURL + '/functions/v1/create-pos-charge', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+(await authToken())},
-      body: JSON.stringify({school_id: SID, student_id: studentId, line_items: [bookSessionLineItem()]}),
+      body: JSON.stringify({school_id: SID, student_id: studentId, line_items: [bookSessionLineItem()], idempotency_key: ('booksession-'+SID+'-'+studentId+'-'+JSON.stringify(bookSessionLineItem())).replace(/[^A-Za-z0-9_-]/g,'').slice(0,120)}),   // §NO-DOUBLE-CHARGE: server-side dedup
     });
     var data = await r.json();
     if(data.error){
@@ -7414,6 +7498,8 @@ var saveResult = await saveSessionRow();
     await showBookSessionSuccess('card');
   }catch(e){
     setMsg('sessionMsg','Session saved. Charge error: '+(e.message||'Network error'),'error');
+  }finally{
+    if(_bsBtn) _bsBtn.disabled = false;   // §NO-DOUBLE-CHARGE: restore for retry
   }
 }
 
@@ -8123,7 +8209,7 @@ function renderMembersTableFiltered(list) {
       tagHtml = studentTags.map(function(t){ return '<span style="display:inline-block;font-size:0.6rem;padding:0.1rem 0.4rem;border-radius:10px;background:'+t.color+'22;border:1px solid '+t.color+'66;color:'+t.color+';margin:0.1rem">'+t.name+'</span>'; }).join('');
     }
     return '<tr style="cursor:pointer" onclick="openStudentProfile(\''+s.id+'\')">' +
-      '<td class="name">'+atRiskBadge(s.id)+s.first_name+' '+s.last_name+'</td>' +
+      '<td class="name">'+atRiskBadge(s.id)+escapeCheckout(s.first_name+' '+s.last_name)+'</td>' +
       '<td>'+(s.email||'--')+'</td>' +
       '<td>'+pn+'</td>' +
       '<td>'+mn+'</td>' +
@@ -8323,7 +8409,7 @@ async function openStudentProfile(sid) {
     document.getElementById('profileBeltBadge').style.display='none';
   }
   var nd = document.getElementById('profileNoteDisplay');
-  nd.innerHTML = s.notes ? '<div style="background:var(--surface);border:1px solid var(--border);padding:0.75rem;border-left:2px solid var(--gold)">'+s.notes.replace(/\n/g,'<br>')+'</div>' : '<div style="color:var(--muted);font-style:italic">No notes yet.</div>';
+  nd.innerHTML = s.notes ? '<div style="background:var(--surface);border:1px solid var(--border);padding:0.75rem;border-left:2px solid var(--gold)">'+escapeCheckout(s.notes).replace(/\n/g,'<br>')+'</div>' : '<div style="color:var(--muted);font-style:italic">No notes yet.</div>';
   await loadProfileAttendance(sid);
   await loadPromotionHistory(sid);
   await loadMessageHistory(sid);
@@ -10470,7 +10556,7 @@ async function ccOnProgramsChange(){
   else{
     var arr=(allClasses||[]).filter(function(c){return pids.indexOf(c.program_id)!==-1;});
     if(!arr.length){ cc.innerHTML='<div style="color:var(--muted);font-size:0.82rem;font-style:italic">No classes in the selected programs.</div>'; }
-    else{ cc.innerHTML=arr.map(function(c){var dn=c.name||c.title||'Untitled';return '<label class="check-item"><input type="checkbox" class="cc-class-check" value="'+c.id+'"/><span class="check-item-label">'+dn+(c.start_time?' <span style="color:var(--muted)">'+fmtTime(c.start_time)+'</span>':'')+'</span></label>';}).join(''); }
+    else{ cc.innerHTML=arr.map(function(c){var dn=escapeCheckout(c.name||c.title||'Untitled');return '<label class="check-item"><input type="checkbox" class="cc-class-check" value="'+c.id+'"/><span class="check-item-label">'+dn+(c.start_time?' <span style="color:var(--muted)">'+fmtTime(c.start_time)+'</span>':'')+'</span></label>';}).join(''); }
   }
   var beltField=document.getElementById('ccBeltField');
   var beltSel=document.getElementById('ccBelt');
@@ -12479,7 +12565,7 @@ function renderLeads(){
     if(!filtered.length){el.innerHTML='<div style="font-size:0.82rem;color:var(--muted);font-style:italic;padding:0.5rem">No leads</div>';return;}
     el.innerHTML=filtered.map(function(l){
       var prog=allPrograms.find(function(p){return p.id===l.program_id;});
-      return '<div class="lead-card" onclick="openEditLead(\''+l.id+'\')"><div class="lead-name">'+l.first_name+' '+l.last_name+'</div><div class="lead-meta">'+(prog?prog.name:'--')+' \u00B7 '+l.source+'</div>'+(l.status==='converted'&&l.converted_at?'<div style="font-size:0.66rem;color:#5A9A6A;margin-top:0.25rem"><i class="fa-solid fa-clock" style="margin-right:0.2rem"></i>Converted '+leadAgo(l.converted_at)+'</div>':'')+'<div style="display:flex;gap:0.4rem;margin-top:0.5rem"><button class="btn-sm" style="font-size:0.68rem" onclick="event.stopPropagation();bookTrialFromLead(\''+l.id+'\')"><i class="fa-solid fa-user-clock" style="margin-right:0.2rem"></i>Book Trial</button><button class="btn-sm" style="font-size:0.68rem;border-color:#A04040;color:#E07070" onclick="event.stopPropagation();deleteLead(\''+l.id+'\')"><i class="fa-solid fa-trash"></i></button></div></div>';
+      return '<div class="lead-card" onclick="openEditLead(\''+l.id+'\')"><div class="lead-name">'+escapeCheckout(l.first_name+' '+l.last_name)+'</div><div class="lead-meta">'+(prog?prog.name:'--')+' \u00B7 '+l.source+'</div>'+(l.status==='converted'&&l.converted_at?'<div style="font-size:0.66rem;color:#5A9A6A;margin-top:0.25rem"><i class="fa-solid fa-clock" style="margin-right:0.2rem"></i>Converted '+leadAgo(l.converted_at)+'</div>':'')+'<div style="display:flex;gap:0.4rem;margin-top:0.5rem"><button class="btn-sm" style="font-size:0.68rem" onclick="event.stopPropagation();bookTrialFromLead(\''+l.id+'\')"><i class="fa-solid fa-user-clock" style="margin-right:0.2rem"></i>Book Trial</button><button class="btn-sm" style="font-size:0.68rem;border-color:#A04040;color:#E07070" onclick="event.stopPropagation();deleteLead(\''+l.id+'\')"><i class="fa-solid fa-trash"></i></button></div></div>';
     }).join('');
   });
 }
@@ -12647,8 +12733,8 @@ async function familyCheckoutCharge(){
 }
 function openAddFamily(){ document.getElementById('addFamilyTitle').textContent='Add Family';document.getElementById('familyEditId').value='';document.getElementById('familyName').value='';document.getElementById('familyEmail').value='';document.getElementById('familyPhone').value='';document.getElementById('familyNotes').value='';document.getElementById('familyMsg').textContent='';document.getElementById('familyLinkedStudentsSection').style.display='none';document.getElementById('familyPortalSection').style.display='none';document.getElementById('familyCardSection').style.display='none';document.getElementById('addFamilyModal').classList.add('active'); }
 function openEditFamily(fid){ var f=allFamilies.find(function(x){return x.id===fid;}); if(!f) return; document.getElementById('addFamilyTitle').textContent='Edit Family';document.getElementById('familyEditId').value=f.id;document.getElementById('familyName').value=f.name||'';document.getElementById('familyEmail').value=f.email||'';document.getElementById('familyPhone').value=f.phone||'';document.getElementById('familyNotes').value=f.notes||'';document.getElementById('familyMsg').textContent='';document.getElementById('familyLinkedStudentsSection').style.display='block';renderFamilyLinkedStudents(fid);document.getElementById('familyPortalSection').style.display='block';document.getElementById('familyCardSection').style.display='block';renderFamilyPortalStatus(fid);renderFamilyCard(fid);document.getElementById('addFamilyModal').classList.add('active'); }
-function renderFamilyLinkedStudents(fid){ var linked=allStudents.filter(function(s){return s.family_id===fid;}); var el=document.getElementById('familyLinkedStudentsList'); if(!linked.length){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.82rem">No students linked yet.</div>';return;} el.innerHTML=linked.map(function(s){return '<div class="family-student-link"><div style="color:var(--white)">'+s.first_name+' '+s.last_name+'</div><button class="btn-sm" onclick="unlinkFamilyStudent(\''+s.id+'\')">Unlink</button></div>';}).join(''); }
-async function unlinkFamilyStudent(sid){ var r=await sb.from("students").update({family_id:null}).eq("id",sid); if(r.error){showToast("Could not unlink student: "+r.error.message,"err");return;} await loadStudents(); var fid=document.getElementById("familyEditId").value; if(fid) renderFamilyLinkedStudents(fid); }function searchFamilyStudent(){ var q=document.getElementById('familyStudentSearch').value.toLowerCase().trim(); var el=document.getElementById('familyStudentSearchResults'); if(!q||q.length<2){el.style.display='none';return;} var fid=document.getElementById('familyEditId').value; var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q)&&!s.family_id;}).slice(0,5); el.style.display='block'; if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No unlinked students found.</div>';return;} el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="linkFamilyStudent(\''+s.id+'\',\''+fid+'\')">'+s.first_name+' '+s.last_name+'</div>';}).join(''); }
+function renderFamilyLinkedStudents(fid){ var linked=allStudents.filter(function(s){return s.family_id===fid;}); var el=document.getElementById('familyLinkedStudentsList'); if(!linked.length){el.innerHTML='<div style="color:var(--muted);font-style:italic;font-size:0.82rem">No students linked yet.</div>';return;} el.innerHTML=linked.map(function(s){return '<div class="family-student-link"><div style="color:var(--white)">'+escapeCheckout(s.first_name)+' '+escapeCheckout(s.last_name)+'</div><button class="btn-sm" onclick="unlinkFamilyStudent(\''+s.id+'\')">Unlink</button></div>';}).join(''); }
+async function unlinkFamilyStudent(sid){ var r=await sb.from("students").update({family_id:null}).eq("id",sid); if(r.error){showToast("Could not unlink student: "+r.error.message,"err");return;} await loadStudents(); var fid=document.getElementById("familyEditId").value; if(fid) renderFamilyLinkedStudents(fid); }function searchFamilyStudent(){ var q=document.getElementById('familyStudentSearch').value.toLowerCase().trim(); var el=document.getElementById('familyStudentSearchResults'); if(!q||q.length<2){el.style.display='none';return;} var fid=document.getElementById('familyEditId').value; var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q)&&!s.family_id;}).slice(0,5); el.style.display='block'; if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No unlinked students found.</div>';return;} el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="linkFamilyStudent(\''+s.id+'\',\''+fid+'\')">'+escapeCheckout(s.first_name)+' '+escapeCheckout(s.last_name)+'</div>';}).join(''); }
 async function linkFamilyStudent(sid,fid){ if(!fid) return; var r=await sb.from("students").update({family_id:fid}).eq("id",sid); if(r.error){showToast("Could not link student: "+r.error.message,"err");return;} await loadStudents(); renderFamilyLinkedStudents(fid); document.getElementById("familyStudentSearch").value=""; document.getElementById("familyStudentSearchResults").style.display="none"; }function closeAddFamily(){ document.getElementById('addFamilyModal').classList.remove('active'); }
 async function saveFamily(){
   var eid=document.getElementById("familyEditId").value;
@@ -13864,7 +13950,7 @@ window.previewMilestone = function(milestone){
   var anim = selEl ? selEl.dataset.anim : "confetti";
   var msgEl = document.getElementById("mmsg-" + milestone);
   var msg = msgEl ? msgEl.value.trim() : "";
-  var url = "kiosk.html?school=" + encodeURIComponent(slug)
+  var url = "kiosk.html?school=" + encodeURIComponent(slug) + "&k=" + encodeURIComponent((window.schoolData&&window.schoolData.kiosk_token)||"")
           + "&preview=1&milestone=" + milestone
           + "&anim=" + encodeURIComponent(anim)
           + "&msg=" + encodeURIComponent(msg);
@@ -14158,11 +14244,11 @@ function updatePOSQty(pid,delta){ var item=posCart.find(function(c){return c.id=
   var el=document.getElementById('posCartList'); var total=posCart.reduce(function(sum,c){return sum+c.price*c.qty;},0);
   document.getElementById('posTotalAmount').textContent='$'+total.toFixed(2);
   if(!posCart.length){el.innerHTML='<div id="posCartEmpty" style="color:var(--muted);font-style:italic;font-size:0.85rem;text-align:center;padding:2rem 0">Cart is empty</div>';}
-  else{el.innerHTML=posCart.map(function(c){return '<div class="pos-cart-row"><div class="pos-cart-name">'+c.name+(c.type==='pack'?'<span style="font-size:0.6rem;color:var(--gold);margin-left:0.4rem">PACK</span>':'')+'</div><div class="pos-cart-qty"><button class="pos-qty-btn" onclick="updatePOSQty(\''+c.id+'\',-1)">-</button><span style="font-size:0.85rem;color:var(--white);min-width:16px;text-align:center">'+c.qty+'</span><button class="pos-qty-btn" onclick="updatePOSQty(\''+c.id+'\',1)">+</button></div><div class="pos-cart-price">$'+(c.price*c.qty).toFixed(2)+'</div></div>';}).join('');}
+  else{el.innerHTML=posCart.map(function(c){return '<div class="pos-cart-row"><div class="pos-cart-name">'+escapeCheckout(c.name)+(c.type==='pack'?'<span style="font-size:0.6rem;color:var(--gold);margin-left:0.4rem">PACK</span>':'')+'</div><div class="pos-cart-qty"><button class="pos-qty-btn" onclick="updatePOSQty(\''+c.id+'\',-1)">-</button><span style="font-size:0.85rem;color:var(--white);min-width:16px;text-align:center">'+c.qty+'</span><button class="pos-qty-btn" onclick="updatePOSQty(\''+c.id+'\',1)">+</button></div><div class="pos-cart-price">$'+(c.price*c.qty).toFixed(2)+'</div></div>';}).join('');}
   updatePOSCheckoutButtons();
 }
-function searchPOSStudent(){ var q=document.getElementById('posStudentSearch').value.toLowerCase().trim(); var el=document.getElementById('posStudentResults'); if(!q||q.length<2){el.style.display='none';return;} var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q);}).slice(0,6); el.style.display='block'; if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No students found.</div>';return;} el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="selectPOSStudent(\''+s.id+'\',\''+s.first_name+' '+s.last_name+'\')">'+s.first_name+' '+s.last_name+'</div>';}).join(''); }
-function selectPOSStudent(sid,name){ posSelectedStudentId=sid; posSelectedStudentName=name; document.getElementById('posStudentSearch').value=name; document.getElementById('posStudentResults').style.display='none'; var sel=document.getElementById('posSelectedStudent'); sel.style.display='block'; sel.innerHTML='<i class="fa-solid fa-circle-check" style="color:#5A9A6A;margin-right:0.4rem"></i>'+name; updatePOSCheckoutButtons(); loadPosCredit(); }
+function searchPOSStudent(){ var q=document.getElementById('posStudentSearch').value.toLowerCase().trim(); var el=document.getElementById('posStudentResults'); if(!q||q.length<2){el.style.display='none';return;} var filtered=allStudents.filter(function(s){return(s.first_name+' '+s.last_name).toLowerCase().includes(q);}).slice(0,6); el.style.display='block'; if(!filtered.length){el.innerHTML='<div style="padding:0.5rem 0.75rem;font-size:0.82rem;color:var(--muted);font-style:italic">No students found.</div>';return;} el.innerHTML=filtered.map(function(s){return '<div style="padding:0.6rem 0.75rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--white)" onclick="selectPOSStudent(\''+s.id+'\')">'+escapeCheckout(s.first_name+' '+s.last_name)+'</div>';}).join(''); }
+function selectPOSStudent(sid){ var _s=allStudents.find(function(x){return x.id===sid;}); var name=_s?(_s.first_name+' '+_s.last_name):''; posSelectedStudentId=sid; posSelectedStudentName=name; document.getElementById('posStudentSearch').value=name; document.getElementById('posStudentResults').style.display='none'; var sel=document.getElementById('posSelectedStudent'); sel.style.display='block'; sel.innerHTML='<i class="fa-solid fa-circle-check" style="color:#5A9A6A;margin-right:0.4rem"></i>'+escapeCheckout(name); updatePOSCheckoutButtons(); loadPosCredit(); }
 function clearPOSCart(){ posCart=[];posSelectedStudentId=null;posSelectedStudentName=null;posCreditBalanceCents=0;posCreditApplyCents=0;document.getElementById('posStudentSearch').value='';document.getElementById('posSelectedStudent').style.display='none';renderPOSCart();buildPOSQuickItems(); }
 // §POS-CHECKOUT — Three payment paths (Phase N, 2026-05-11)
 
@@ -14324,6 +14410,7 @@ async function checkoutPOS_cardOnFile(){
   if(!posCart.length){setMsg('posMsg','Add items to cart first.','error');return;}
   if(!posSelectedStudentId){setMsg('posMsg','Select a student first.','error');return;}
 
+  var _cofBtn = document.getElementById('posBtnCardOnFile'); if(_cofBtn) _cofBtn.disabled = true;   // §NO-DOUBLE-CHARGE: block double-click
   setMsg('posMsg','Charging card on file...','');
   try{
     var _sess = await sb.auth.getSession();
@@ -14337,6 +14424,7 @@ async function checkoutPOS_cardOnFile(){
         line_items: posCartLineItems(),
         credit_to_apply_cents: posCreditApplyCents,
         applied_by: _uid,
+        idempotency_key: 'poscharge-'+SID+'-'+(posSelectedStudentId||'guest')+'-'+posCreditApplyCents+'-'+posCart.map(function(_c){return _c.id+'x'+(_c.qty||1);}).join('|'),   // §NO-DOUBLE-CHARGE: server-side dedup
       }),
     });
     var data = await r.json();
@@ -14366,6 +14454,8 @@ async function checkoutPOS_cardOnFile(){
     setTimeout(function(){document.getElementById('posMsg').textContent=''; closePOS();}, 2500);
   }catch(e){
     setMsg('posMsg', e.message || 'Network error', 'error');
+  }finally{
+    if(typeof updatePOSCheckoutButtons==='function') updatePOSCheckoutButtons(); else if(_cofBtn) _cofBtn.disabled = false;   // §NO-DOUBLE-CHARGE: restore correct button state
   }
 }
 
@@ -16360,11 +16450,20 @@ function printExportTable(title, schoolName, subtitle, headHtml, bodyHtml){
 
 async function loadStripeConnectStatus(){
   try{
-    var r=await sb.from('schools').select('stripe_account_id,stripe_connected').eq('id',SID).single();
-    if(r.data&&r.data.stripe_connected){
-      document.getElementById('stripeConnectStatus').innerHTML='<div style="display:flex;align-items:center;gap:0.75rem"><div style="width:10px;height:10px;border-radius:50%;background:#5A9A6A"></div><div style="font-size:0.88rem;color:#7DBD7D">Stripe connected</div></div>';
-      document.getElementById('stripeConnectBtn').textContent='Manage Stripe';
+    var r=await sb.from('schools').select('stripe_account_id,stripe_connected,stripe_onboarded').eq('id',SID).single();
+    if(!r.data) return;
+    var onboarded=!!r.data.stripe_onboarded, connected=!!r.data.stripe_connected;
+    var statusEl=document.getElementById('stripeConnectStatus'), btn=document.getElementById('stripeConnectBtn');
+    if(onboarded){
+      // §STRIPE-TRUTH (O2) — green ONLY when the account can actually accept payments.
+      if(statusEl) statusEl.innerHTML='<div style="display:flex;align-items:center;gap:0.75rem"><div style="width:10px;height:10px;border-radius:50%;background:#5A9A6A"></div><div style="font-size:0.88rem;color:#7DBD7D">Stripe connected — ready to accept payments</div></div>';
+      if(btn){ btn.textContent='Manage Stripe'; btn.onclick=function(){ window.open('https://dashboard.stripe.com/','_blank'); }; }   // §STRIPE-RECOVER (O3): open their Stripe, never the throwing re-connect
+    } else if(connected){
+      // Linked via OAuth but verification/KYC not finished — cannot charge yet.
+      if(statusEl) statusEl.innerHTML='<div style="display:flex;align-items:center;gap:0.75rem"><div style="width:10px;height:10px;border-radius:50%;background:#E0A05A"></div><div style="font-size:0.88rem;color:#E0A05A">Almost there — finish verifying with Stripe to accept payments</div></div>';
+      if(btn){ btn.textContent='Finish verifying with Stripe'; btn.onclick=function(){ window.open('https://dashboard.stripe.com/','_blank'); }; }   // §STRIPE-RECOVER (O3): self-serve KYC completion
     }
+    // not connected → leave the default Connect button + connectStripe() onclick untouched.
   }catch(e){}
 }
 async function connectStripe(){
@@ -18771,7 +18870,7 @@ var url = SURL + "/functions/v1/event-og?id=" + window.currentEventId;
   (function(){
     var lastFocus=null;
     function focusables(root){ return Array.prototype.slice.call(root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function(el){ return el.offsetParent!==null; }); }
-    function activate(ov){ var d=ov.querySelector('.modal'); if(d){ d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); if(!d.hasAttribute('tabindex')) d.setAttribute('tabindex','-1'); } lastFocus=document.activeElement; var f=d?focusables(d):[]; setTimeout(function(){ var t=f[0]||d||ov; if(t&&t.focus){ try{ t.focus(); }catch(e){} } },30); }
+    function activate(ov){ var d=ov.querySelector('.modal')||ov; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true'); if(!d.hasAttribute('tabindex')) d.setAttribute('tabindex','-1'); var t=d.querySelector('.modal-title'); if(t){ if(!t.id){ t.id='mtitle-'+Math.random().toString(36).slice(2,8); } d.setAttribute('aria-labelledby',t.id); } lastFocus=document.activeElement; var pref=d.querySelector('input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])'); var f=focusables(d); setTimeout(function(){ var t2=pref||f[0]||d||ov; if(t2&&t2.focus){ try{ t2.focus(); }catch(e){} } },30); }
     function deactivate(){ if(lastFocus&&lastFocus.focus){ try{ lastFocus.focus(); }catch(e){} } lastFocus=null; }
     document.addEventListener('keydown',function(e){
       if(e.key!=='Escape'&&e.key!=='Tab') return;
