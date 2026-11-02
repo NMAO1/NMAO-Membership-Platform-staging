@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" href="nmao_logo.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
   /* ── Self-contained styles for new sections (independent of styles.css) ── */
@@ -36,7 +36,7 @@
     text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:1rem;
   }
   .price-solo .ps-amount{
-    font-family:'Libre Baskerville',serif;color:#F5F0E8;line-height:1;
+    font-family:'Fraunces',serif;color:#F5F0E8;line-height:1;
     margin-bottom:0.4rem;
   }
   .price-solo .ps-amount .ps-d{font-size:1.6rem;vertical-align:top;color:#9A8F80;}
@@ -55,7 +55,7 @@
     text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:0.2rem;
   }
   .price-solo .ps-accred .amt{
-    font-family:'Libre Baskerville',serif;font-size:1.5rem;color:#F5F0E8;font-weight:700;line-height:1;
+    font-family:'Fraunces',serif;font-size:1.5rem;color:#F5F0E8;font-weight:700;line-height:1;
   }
   .price-solo .ps-accred .amt span{font-size:0.8rem;color:#9A8F80;font-weight:400;}
   .price-solo .ps-accred .amt .strike{text-decoration:line-through;color:#9A8F80;font-weight:400;font-size:1.05rem;margin-right:0.4rem;}
@@ -71,7 +71,7 @@
   .ps-features li::before{content:"\25C8";position:absolute;left:0;color:#C9A84C;font-size:0.85rem;}
   .ps-cta{
     display:inline-block;background:#C9A84C;color:#0A0A0A;border:none;cursor:pointer;
-    font-family:'Libre Baskerville',serif;font-size:0.82rem;letter-spacing:0.14em;
+    font-family:'Fraunces',serif;font-size:0.82rem;letter-spacing:0.14em;
     text-transform:uppercase;font-weight:700;padding:1rem 2.5rem;transition:opacity 0.2s;
   }
   .ps-cta:hover{opacity:0.88;}
@@ -84,7 +84,7 @@
   .faq-q{
     width:100%;text-align:left;background:none;border:none;cursor:pointer;
     padding:1.35rem 1.6rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;
-    font-family:'Libre Baskerville',serif;font-size:1.02rem;color:#F5F0E8;font-weight:700;line-height:1.35;
+    font-family:'Fraunces',serif;font-size:1.02rem;color:#F5F0E8;font-weight:700;line-height:1.35;
   }
   .faq-q:hover{color:#C9A84C;}
   .faq-mark{flex-shrink:0;color:#C9A84C;font-size:1.2rem;transition:transform 0.25s ease;font-family:'Lato',sans-serif;}
@@ -102,7 +102,11 @@
     --black:#0b0f1e; --near:#111730; --card:#151c34; --border:#28304e; --border2:#2a335a;
     --surface:#151c34; --surface2:#1a2340;
     --white:#eef1f8; --muted:#727b99; --muted2:#9aa3bd;
+    --font-display:'Fraunces',Georgia,serif;
+    --font-ui:'Inter',system-ui,-apple-system,sans-serif;
   }
+  body{font-family:var(--font-ui)}  /* clean sans body; serif reserved for headlines */
+  .hero-sub{font-style:normal}
   .nav-logo img{height:26px;width:auto;vertical-align:-7px;margin-right:9px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
   #hero{position:relative;overflow:hidden;min-height:clamp(620px,90vh,880px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--nav-height) + 40px) 5vw 64px}
   #hero .hero-bg{display:none}
@@ -153,7 +157,7 @@
 <div class="hero-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:1.5rem;max-width:900px;margin:3rem auto 0;">
 
     <div style="text-align:left;padding:2rem;border:1px solid rgba(201,168,76,0.3);background:linear-gradient(180deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));">
-      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:0.7rem;line-height:1;">&#9672; Save Money</div>
+      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Fraunces',serif;margin-bottom:0.7rem;line-height:1;">&#9672; Save Money</div>
       <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Half the price of the big platforms. Transparent fees. Built-in everything.</div>
       <ul style="list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.85rem;line-height:1.55;">
         <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>About half the price of Mindbody, Zen Planner, and Pike13</li>
@@ -164,7 +168,7 @@
     </div>
 
     <div style="text-align:left;padding:2rem;border:1px solid rgba(201,168,76,0.3);background:linear-gradient(180deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));">
-      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:0.7rem;line-height:1;">&#9671; Save Time</div>
+      <div style="font-size:1.85rem;color:#C9A84C;font-family:'Fraunces',serif;margin-bottom:0.7rem;line-height:1;">&#9671; Save Time</div>
       <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Run the school. Skip the busywork.</div>
       <ul style="list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.85rem;line-height:1.55;">
         <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Self-serve kiosk check-in &mdash; your front desk gets its time back</li>
@@ -187,8 +191,8 @@
     .feat-v2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;max-width:1200px;margin:4rem auto 0;padding:0 1.5rem;}
     .feat-v2-card{background:linear-gradient(180deg,rgba(201,168,76,0.04),rgba(201,168,76,0.01));border:1px solid rgba(201,168,76,0.18);padding:2rem 1.85rem;display:flex;flex-direction:column;transition:transform 0.25s ease,border-color 0.25s ease,box-shadow 0.25s ease;}
     .feat-v2-card:hover{border-color:rgba(201,168,76,0.45);transform:translateY(-3px);box-shadow:0 12px 32px rgba(201,168,76,0.08);}
-    .feat-v2-icon{font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:1.1rem;line-height:1;}
-    .feat-v2-title{font-family:'Libre Baskerville',serif;font-size:1.3rem;color:#F5F0E8;margin:0 0 0.75rem;font-weight:700;line-height:1.25;}
+    .feat-v2-icon{font-size:1.85rem;color:#C9A84C;font-family:'Fraunces',serif;margin-bottom:1.1rem;line-height:1;}
+    .feat-v2-title{font-family:'Fraunces',serif;font-size:1.3rem;color:#F5F0E8;margin:0 0 0.75rem;font-weight:700;line-height:1.25;}
     .feat-v2-tagline{color:#9A8F80;font-size:0.9rem;line-height:1.6;margin:0 0 1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(201,168,76,0.12);}
     .feat-v2-bullets{list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.82rem;line-height:1.55;}
     .feat-v2-bullets li{padding:0.3rem 0 0.3rem 1.05rem;position:relative;}
@@ -305,10 +309,10 @@
   <div style="max-width:820px;margin:0 auto 2.5rem;background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.45);border-left:4px solid #C9A84C;padding:1.5rem 2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
     <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#C9A84C;">&#9672;</div>
     <div style="flex:1;min-width:280px;">
-      <div style="font-family:'Libre Baskerville',serif;font-size:1.1rem;color:#C9A84C;font-weight:700;margin-bottom:0.35rem;">NMAO Accredited Schools Run Free</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;color:#C9A84C;font-weight:700;margin-bottom:0.35rem;">NMAO Accredited Schools Run Free</div>
       <div style="font-size:0.88rem;color:#9A8F80;line-height:1.55;">Schools holding active NMAO Accreditation pay <strong style="color:#C9A84C;">$0/mo</strong> &mdash; no monthly fee, just a 1% platform fee capped at $200. Applied automatically at checkout.</div>
     </div>
-    <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Libre Baskerville',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.85rem 1.5rem;text-decoration:none;font-weight:700;white-space:nowrap;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Accredited &rarr;</a>
+    <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Fraunces',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.85rem 1.5rem;text-decoration:none;font-weight:700;white-space:nowrap;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Accredited &rarr;</a>
   </div>
 
   <!-- SINGLE PLAN -->
@@ -437,11 +441,11 @@
   <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
     <div style="width:40px;height:40px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#C9A84C;">&#9672;</div>
     <div style="text-align:left;">
-      <div style="font-family:'Libre Baskerville',serif;font-size:0.95rem;color:#F5F0E8;font-weight:700;">Is Your School NMAO Accredited?</div>
+      <div style="font-family:'Fraunces',serif;font-size:0.95rem;color:#F5F0E8;font-weight:700;">Is Your School NMAO Accredited?</div>
       <div style="font-size:0.78rem;color:#9A8F80;margin-top:0.1rem;">Accredited schools pay <strong style="color:#C9A84C;">$0/month</strong> &mdash; the monthly fee is fully waived &mdash; and gain nationwide recognition.</div>
     </div>
   </div>
-  <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Libre Baskerville',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.75rem 1.5rem;text-decoration:none;font-weight:700;transition:opacity 0.2s;white-space:nowrap;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Apply for Accreditation &rarr;</a>
+  <a href="https://nmao.us/apply-for-accreditation/" target="_blank" rel="noopener" style="flex-shrink:0;background:#C9A84C;color:#0A0A0A;font-family:'Fraunces',serif;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.75rem 1.5rem;text-decoration:none;font-weight:700;transition:opacity 0.2s;white-space:nowrap;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Apply for Accreditation &rarr;</a>
 </div>
 
 <!-- FOOTER -->
