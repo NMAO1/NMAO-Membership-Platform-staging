@@ -96,13 +96,36 @@
   /* Signup reassurance microcopy */
   .signup-reassure{text-align:center;font-size:0.72rem;color:#9A8F80;margin-top:0.85rem;letter-spacing:0.03em;}
   .signup-reassure b{color:#C9A84C;font-weight:700;}
+
+  /* ───────── NMAO premium reskin — navy + crest + cinematic hero (landing only) ───────── */
+  :root{
+    --black:#0b0f1e; --near:#111730; --card:#151c34; --border:#28304e; --border2:#2a335a;
+    --surface:#151c34; --surface2:#1a2340;
+    --white:#eef1f8; --muted:#727b99; --muted2:#9aa3bd;
+  }
+  .nav-logo img{height:26px;width:auto;vertical-align:-7px;margin-right:9px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  #hero{position:relative;overflow:hidden;min-height:clamp(620px,90vh,880px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--nav-height) + 40px) 5vw 64px}
+  #hero .hero-bg{display:none}
+  .hero-ring{display:none!important}
+  #hero .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 36%;
+    filter:grayscale(1) contrast(1.07) brightness(.6);transform-origin:center;animation:kb 26s ease-in-out infinite alternate;z-index:0}
+  @keyframes kb{from{transform:scale(1.05)}to{transform:scale(1.17)}}
+  @media(prefers-reduced-motion:reduce){ #hero .hero-photo{animation:none} }
+  #hero .hero-tint{position:absolute;inset:0;z-index:1;mix-blend-mode:screen;opacity:.26;background:linear-gradient(130deg,var(--gold-lt),transparent 58%)}
+  #hero .hero-scrim{position:absolute;inset:0;z-index:1;background:
+    radial-gradient(58% 48% at 50% 38%,rgba(201,168,76,.13),transparent 68%),
+    linear-gradient(180deg,rgba(11,15,30,.8),rgba(11,15,30,.5) 42%,rgba(11,15,30,.96))}
+  #hero .hero-crest,#hero .hero-tag,#hero .hero-title,#hero .hero-sub,#hero .hero-ctas,#hero .trust-line,#hero .hero-stats{position:relative;z-index:2}
+  #hero .hero-crest{width:152px;height:auto;margin:0 auto 16px;filter:drop-shadow(0 16px 34px rgba(0,0,0,.72));animation:sealFloat 5.5s ease-in-out infinite}
+  @keyframes sealFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @media(prefers-reduced-motion:reduce){ #hero .hero-crest{animation:none} }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">NMAO <span>Platform</span></div>
+  <div class="nav-logo"><img src="nmao-crest.png" alt="">NMAO <span>Platform</span></div>
   <ul class="nav-links">
     <li><a href="#ecosystem">Ecosystem</a></li>
     <li><a href="#features">Features</a></li>
@@ -114,11 +137,14 @@
 
 <!-- HERO -->
 <section id="hero">
+  <img class="hero-photo" src="hero-band.jpg" alt="" aria-hidden="true">
+  <span class="hero-tint"></span><span class="hero-scrim"></span>
   <div class="hero-bg"></div>
   <div class="hero-ring"></div>
+  <img class="hero-crest" src="nmao-crest.png" alt="NMAO crest">
   <p class="hero-tag" style="font-size:1.5rem;letter-spacing:0.05em;">Built by Martial Artists, For Martial Artists</p>
   <h1 class="hero-title">Save Money.<br><em>Save Time.</em></h1>
-  <p class="hero-sub">The membership management software built exclusively for martial arts schools. Half the cost of incumbents, twice the focus on what actually matters.</p>
+  <p class="hero-sub">The membership management software built exclusively for martial arts schools. About half the price of the incumbents, twice the focus on what actually matters.</p>
   <div class="hero-ctas">
     <button class="btn-primary" onclick="openModal('signup')">Start Free Trial</button>
     <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore Features</button>
@@ -128,9 +154,9 @@
 
     <div style="text-align:left;padding:2rem;border:1px solid rgba(201,168,76,0.3);background:linear-gradient(180deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));">
       <div style="font-size:1.85rem;color:#C9A84C;font-family:'Libre Baskerville',serif;margin-bottom:0.7rem;line-height:1;">&#9672; Save Money</div>
-      <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Half the cost. Transparent fees. Built-in everything.</div>
+      <div style="font-size:0.95rem;color:#F5F0E8;line-height:1.5;margin-bottom:1.1rem;font-weight:600;">Half the price of the big platforms. Transparent fees. Built-in everything.</div>
       <ul style="list-style:none;padding:0;margin:0;color:#C2B7A8;font-size:0.85rem;line-height:1.55;">
-        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Half the monthly subscription of Mindbody, Zen Planner, and Pike13</li>
+        <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>About half the price of Mindbody, Zen Planner, and Pike13</li>
         <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>Stripe payment processing passed through at cost &mdash; never marked up</li>
         <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>1% platform fee, capped at $200/mo &mdash; competitors pad every swipe</li>
         <li style="padding:0.35rem 0 0.35rem 1rem;position:relative;"><span style="position:absolute;left:0;color:#C9A84C;">&#9642;</span>NMAO Accredited schools pay $0/month &mdash; no subscription at all</li>
@@ -448,7 +474,7 @@
       <div class="field"><label>School Name</label><input type="text" id="sN" placeholder="Your Martial Arts School"></div>
       <div class="field"><label>Your Name</label><input type="text" id="sNm" placeholder="Sensei / Master / Sifu"></div>
       <div class="field"><label>Email</label><input type="email" id="sE" placeholder="you@school.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="sP" placeholder="Create a password"></div>
+      <div class="field"><label>Password</label><input type="password" id="sP" placeholder="Create a password (6+ characters)"></div>
       <button class="btn-sub" id="sSub" onclick="doSignup()">Start Free Trial</button>
       <p class="signup-reassure"><b>90-day free trial</b> &middot; no credit card &middot; cancel anytime</p>
       <p class="signup-reassure" style="margin-top:0.35rem;opacity:0.8">Best set up on a desktop or laptop.</p>
@@ -461,6 +487,22 @@
 var SURL = 'https://ykiozrdwudawpxdzbbyc.supabase.co';
 var SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraW96cmR3dWRhd3B4ZHpiYnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNTAwODQsImV4cCI6MjA5MDYyNjA4NH0.MRv1FnXUpGA0wEWe4cW6lSQFcNb7W0Y_nErSZe1hr8c';
 var sc = supabase.createClient(SURL, SKEY);
+
+// §NET-GUARD — when the connection drops (Wi-Fi switch, sleep/wake, DNS blip) the
+// Supabase client keeps firing token?grant_type=refresh_token on its background
+// ticker; each one fails (ERR_NAME_NOT_RESOLVED) and floods the console. Pause the
+// auto-refresher while the browser reports offline and resume (debounced, since
+// ERR_NETWORK_CHANGED can flap) once it's back, so a dropped link can't spam.
+(function () {
+  var paused = false, timer = null;
+  function pause() { if (paused) return; paused = true; try { sc.auth.stopAutoRefresh(); } catch (_e) {} }
+  function resume() { if (!paused) return; paused = false; try { sc.auth.startAutoRefresh(); } catch (_e) {} }
+  try {
+    window.addEventListener('offline', pause);
+    window.addEventListener('online', function () { if (timer) clearTimeout(timer); timer = setTimeout(resume, 600); });
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) pause();
+  } catch (_e) {}
+})();
 
 // Canonical $99 tier (tier_3) - new schools point here for SMS metering + config.
 var NMAO_TIER_ID = '7019f0b2-370b-4702-9e3b-9974382f0b8e';
@@ -492,6 +534,32 @@ function setMsg(t, c) {
   el.className = 'msg ' + c;
 }
 
+// §NET-MSG — tell a network failure (DNS/connection drop → "Failed to fetch") apart
+// from a real auth error (wrong password), so we can show a human message + Retry
+// instead of the raw "Failed to fetch".
+function isNetErr(err) {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+  if (!err) return false;
+  var m = ((err.message || '') + '').toLowerCase();
+  return err.name === 'AuthRetryableFetchError'
+      || m.indexOf('failed to fetch') >= 0   // Chrome/Firefox
+      || m.indexOf('load failed') >= 0        // Safari
+      || m.indexOf('networkerror') >= 0
+      || m.indexOf('network request failed') >= 0;
+}
+
+function setNetMsg(retryFn) {
+  var el = document.getElementById('mMsg');
+  el.className = 'msg er';
+  el.textContent = "Can't reach the server - check your connection and try again. ";
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = 'Retry';
+  b.style.cssText = 'margin-left:0.4rem;padding:0.15rem 0.6rem;font:inherit;font-size:0.85em;cursor:pointer;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit';
+  b.onclick = function () { el.textContent = ''; retryFn(); };
+  el.appendChild(b);
+}
+
 function toggleFaq(el) {
   el.parentNode.classList.toggle('open');
 }
@@ -501,8 +569,13 @@ async function doLogin() {
   var p = document.getElementById('lP').value;
   if (!e || !p) { setMsg('Please fill in all fields.', 'er'); return; }
   setMsg('Signing in...', '');
-  var r = await sc.auth.signInWithPassword({ email: e, password: p });
-  if (r.error) { setMsg(r.error.message, 'er'); }
+  var r;
+  try { r = await sc.auth.signInWithPassword({ email: e, password: p }); }
+  catch (ex) { r = { error: ex }; }           // defensive: client can throw on a hard network drop
+  if (r.error) {
+    if (isNetErr(r.error)) { setNetMsg(doLogin); }
+    else { setMsg(r.error.message, 'er'); }
+  }
   else { window.location.href = 'dashboard.html'; }
 }
 
@@ -512,10 +585,11 @@ async function doSignup() {
   var email  = document.getElementById('sE').value.trim();
   var pass   = document.getElementById('sP').value;
   if (!school || !name || !email || !pass) { setMsg('Please fill in all fields.', 'er'); return; }
+  if (pass.length < 6) { setMsg('Password must be at least 6 characters.', 'er'); return; }
   var btn = document.getElementById('sSub');
   btn.disabled = true; btn.textContent = 'Creating account...'; setMsg('', '');
 
-  var auth = await sc.auth.signUp({ email: email, password: pass, options: { data: { full_name: name } } });
+  var auth = await sc.auth.signUp({ email: email, password: pass, options: { data: { full_name: name, school_name: school } } });   // §AUTO-CREATE: carry school_name so dashboard can create the school if email-confirm delayed the session
   var userId = (auth.data && auth.data.user) ? auth.data.user.id : null;
   var haveSession = !!(auth.data && auth.data.session);
   if (auth.error) {
@@ -526,7 +600,10 @@ async function doSignup() {
       userId = si.data.user.id; haveSession = true;
       var exist = await sc.from('schools').select('id').eq('owner_id', userId).limit(1);
       if (exist.data && exist.data.length) { window.location.href = 'dashboard.html'; return; }
-    } else { setMsg(auth.error.message, 'er'); btn.disabled = false; btn.textContent = 'Start Free Trial'; return; }
+    } else {
+      if (isNetErr(auth.error)) { setNetMsg(doSignup); } else { setMsg(auth.error.message, 'er'); }
+      btn.disabled = false; btn.textContent = 'Start Free Trial'; return;
+    }
   }
   
   // §SIGNUP-HARDENING — school creation runs server-side (register-school EF):
@@ -537,10 +614,15 @@ async function doSignup() {
   if (haveSession) {
     var _sess = await sc.auth.getSession();
     var _tok = (_sess.data && _sess.data.session) ? _sess.data.session.access_token : SKEY;
+    // §AMBASSADOR — carry the referral slug (?p=<slug>) into register-school so it
+    // records schools.referral_slug. Stored to localStorage so it survives an
+    // email-confirm bounce (dashboard.html re-sends it on the deferred create).
+    var refP = '';
+    try { refP = (new URLSearchParams(location.search).get('p') || '').trim().toLowerCase(); if (refP) { localStorage.setItem('nmao_ref_p', refP); } else { refP = localStorage.getItem('nmao_ref_p') || ''; } } catch (_e) {}
     var reg = await fetch(SURL + '/functions/v1/register-school', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _tok },
-      body: JSON.stringify({ school_name: school, email: email })
+      body: JSON.stringify({ school_name: school, email: email, p: refP || undefined })
     });
     var regData = await reg.json().catch(function () { return {}; });
     if (!reg.ok || !regData.ok) {
